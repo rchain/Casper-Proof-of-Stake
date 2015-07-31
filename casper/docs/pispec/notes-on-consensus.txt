@@ -1,8 +1,8 @@
 Notes on Consensus
-Vlad ZamfirJuly 21th,2015
+Vlad Zamfir July 21th,2015
 
 Consensus protocols build reliable processes out of unreliable processes
-e.g. a process (or protocol) that provides a service by replicating changes to a deterministic automata across many potentially unreliable or untrusted computers
+ e.g. a process (or protocol) that provides a service by replicating changes to a deterministic automata across many potentially unreliable or untrusted computers
 
 
 
@@ -50,7 +50,7 @@ If f nodes are faulty,
 f + 1 node signatures are required for a node to believe that the message was signed by at least one correct node
 
 Traditional Consensus Protocols
-…. For consensus we must know that a majority of correct nodes approve of a change to the state
+…. For consensus we must know that a majority of correct nodes approve of a change to the state 
  f 
 
 Traditional Consensus Protocols
@@ -99,7 +99,7 @@ Traditional Consensus Protocols
 faulty nodes
 correct nodes
 majority of correct nodes
-byzantine quorum(c1 + c3)
+byzantine quorum (c1 + c3)
 quorum surplus
 (c2 - c4)
 0%
@@ -125,7 +125,7 @@ quorum surplus
  f 
 
 Traditional Consensus Protocols
-A fault tolerance f > ⅓ would require a quorum size that is greater than ⅔.This quorum cannot be guaranteed to form if there are more than 1 - ⅔ = ⅓ faults, 
+A fault tolerance f > ⅓ would require a quorum size that is greater than ⅔.  This quorum cannot be guaranteed to form if there are more than 1 - ⅔ = ⅓ faults, 
 
 ….and we just assumed that f > ⅓.
  f 
@@ -135,7 +135,7 @@ The highest fault tolerance we can hope for is:
       f = ⅓ 
 
 |quorum| = 50% + (f + e)/2 = ⅔ + e/2
-|correct| = 100% - (f + e) = ⅔ - e|correct| < |quorum| by 3e/2, and we can only tolerate faults if |correct| >= |quorum|
+|correct| = 100% - (f + e) = ⅔ - e |correct| < |quorum| by 3e/2, and we can only tolerate faults if |correct| >= |quorum|
  f 
 
 Traditional Consensus Protocols
@@ -147,7 +147,7 @@ In this case it is possible for the correct node to safely commit the change to 
 
 
 Traditional Consensus Protocols
-We need to assume that:A correct node “knows” that other correct nodes will commit to the same change to the consensus because it knows that they are using the same logic to update their copy of the state
+We need to assume that:  A correct node “knows” that other correct nodes will commit to the same change to the consensus because it knows that they are using the same logic to update their copy of the state
 
 Economic Consensus Protocols
 In economic consensus, we relax the previous assumption. 
@@ -156,14 +156,14 @@ The network’s behaviour is constrained by the economics of the protocol rather
 
 Economic Consensus Protocols..
 Definition:
-Economic consensus protocols are consensus protocols that use economic mechanisms defined by the protocol to prevent byzantine faults.
+ Economic consensus protocols are consensus protocols that use economic mechanisms defined by the protocol to prevent byzantine faults.
 
 Economic Consensus Protocols..
-The security of an economic consensus protocol should be demonstrated through economic analysis.Economic analysis is unfortunately much harder to conduct than byzantine fault tolerance analysis.
+The security of an economic consensus protocol should be demonstrated through economic analysis.  Economic analysis is unfortunately much harder to conduct than byzantine fault tolerance analysis.
 
 
 Economic Consensus Protocols..
-In general we will aim to show that an economic consensus protocol is:Incentive compatible: 
+In general we will aim to show that an economic consensus protocol is:  Incentive compatible: 
 All nodes have a direct incentive to work together to update and secure the consensus against faults
 
 
@@ -178,7 +178,7 @@ In the worst case, a majority coalition has an incentive to reverse history.
 
 
 Economic Consensus Protocols..
-In general we will aim to also show that an economic consensus protocol is:Robust against incentive attacks: 
+In general we will aim to also show that an economic consensus protocol is:  Robust against incentive attacks: 
 It would require a large expenditure out of a large budget to break the protocol’s incentive compatibility.
 
 
@@ -207,7 +207,7 @@ These deposits must be placed by a validator for their blocks to represent valid
 Economic Consensus Protocols..
 Counter-example: 
 
-Transactions-as-PoW is a consensus protocol that is expensive to attack, but which does not use an internal ledger to achieve its economics.It requires transactions to be computationally expensive and to refer to previous transactions.
+Transactions-as-PoW is a consensus protocol that is expensive to attack, but which does not use an internal ledger to achieve its economics. It requires transactions to be computationally expensive and to refer to previous transactions.
 
 Blockchain-based consensus protocols
 Achieve consensus by having nodes choose between competing histories (called blockchains or forks) based on a common fork-choice rule.
@@ -226,7 +226,7 @@ Blockchain-based consesnsus:  		CA(P)
 Traditional consensus:                	CA(P)
 
 Blockchain-based consensus protocols
-have a kind of fault-tolerance that doesn’t exist in the context of traditional protocols:The fork-based fault-tolerance is the proportion of network resources required to create a fork that is chosen by the fork-choice rule in favour of any fork that can be created by the remaining nodes.
+have a kind of fault-tolerance that doesn’t exist in the context of traditional protocols:  The fork-based fault-tolerance is the proportion of network resources required to create a fork that is chosen by the fork-choice rule in favour of any fork that can be created by the remaining nodes.
 
 Blockchain-based consensus protocols
 Traditionally, blockchain-based consensus protocols have a fork-based fault-tolerance of 50%.
@@ -234,10 +234,10 @@ Traditionally, blockchain-based consensus protocols have a fork-based fault-tole
 Traditional fault tolerance refers to the number of nodes that can be byzantine while it is still impossible for correct nodes to disagree.
 
 Blockchain-based consensus protocols
-Traditional fault tolerance: “How many of the nodes who made this fork would need to be byzantine for it to possibly be reverted?”Fork-based fault tolerance: “How many nodes need to be byzantine for the guarantee that the winning fork is one created by correct nodes?”
+Traditional fault tolerance: “How many of the nodes who made this fork would need to be byzantine for it to possibly be reverted?”  Fork-based fault tolerance: “How many nodes need to be byzantine for the guarantee that the winning fork is one created by correct nodes?”
 
 Decentralization analysis
-Traditional: “How many nodes need to be byzantine for there to be a commitment that matches this one?”Fork-based: “How many nodes need to be correct, to guarantee that the winning fork is the one created by correct nodes?”
+Traditional: “How many nodes need to be byzantine for there to be a commitment that matches this one?”  Fork-based: “How many nodes need to be correct, to guarantee that the winning fork is the one created by correct nodes?”
 
 Economic Consensus Protocols..
 Example: 
@@ -262,11 +262,11 @@ Economic Consensus Protocols..
 Example, continued: 
 
 We therefore commonly say that Bitcoin has a byzantine fault tolerance of 50%.
-Economic analysis, on the other hand, is not that simple..
+ Economic analysis, on the other hand, is not that simple..
 
 
 Economic Consensus Protocols..
-Example, continued: If we want to show that the Bitcoin protocol is secured by economics rather than by correct nodes, we must show that it is incentive compatible and robust to incentive attacks, ideally with as few assumptions as possible.
+Example, continued: If we want to show that the Bitcoin protocol is secured by economics rather than by correct nodes, we must show that it is incentive compatible and robust to incentive attacks, ideally with as few assumptions as possible.
 
 
 Economic Consensus Protocols..
