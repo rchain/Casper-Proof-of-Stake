@@ -1,0 +1,808 @@
+% ------------------------------------------------------------------------
+% AMS-LaTeX Paper ********************************************************
+% ------------------------------------------------------------------------
+% Submitted:      Dec 15 2003
+% Final Version:  
+% Accepted:       
+% ------------------------------------------------------------------------
+% This is a journal top-matter template file for use with AMS-LaTeX.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% TODO(mike): locating a closure at a name: how to translate a closure into a process that gets stuck into the cell
+
+
+
+%\documentclass{tran-l}
+\documentclass[twocolumn]{amsart}
+%\documentclass[]{amsart}
+%\documentclass[]{sig-alternate}
+%\documentclass[]{acm_proc_article-sp}
+%\documentclass[]{llncs}
+
+
+%\documentclass[]{prentcsmacro}
+
+%\usepackage[active]{srcltx} % SRC Specials for DVI Searching
+\usepackage{url}
+\usepackage[pdf]{pstricks}
+\usepackage{pstricks-add, pst-grad, pst-plot}
+\usepackage[tiling]{pst-fill}
+\psset{linewidth=0.3pt,dimen=middle}
+\psset{xunit=.70cm,yunit=0.70cm}
+\psset{angleA=-90,angleB=90,ArrowInside=->,arrowscale=2}
+
+
+% From Allen's stable.
+\usepackage{bigpage}
+\usepackage{bcprules}
+%\usepackage{code}
+\usepackage{mathpartir}
+\usepackage{listings}
+\usepackage{mathtools}
+%\usepackage[fleqn]{amsmath}
+\usepackage{amsfonts}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{caption}
+%\usepackage{multicol}
+
+% Math
+\newcommand{\maps}{\colon}
+\newcommand{\NN}{\mathbb{N}}
+% Double brackets
+\newcommand{\ldb}{[\![}
+\newcommand{\rdb}{]\!]}
+\newcommand{\ldrb}{(\!(}
+\newcommand{\rdrb}{)\!)}
+\newcommand{\lliftb}{\langle\!|}
+\newcommand{\rliftb}{|\!\rangle}
+% \newcommand{\lpquote}{\langle}
+% \newcommand{\rpquote}{\rangle}
+% \newcommand{\lpquote}{\lceil}
+% \newcommand{\rpquote}{\rceil}
+\newcommand{\lpquote}{\ulcorner}
+\newcommand{\rpquote}{\urcorner}
+\newcommand{\newkw}{\nu}
+
+% SYNTAX
+\newcommand{\id}[1]{\texttt{#1}}
+\newcommand{\none}{\emptyset}
+\newcommand{\eps}{\epsilon}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\rep}[2]{\id{\{$#1$,$#2$\}}}
+\newcommand{\elt}[2]{\id{$#1$[$#2$]}}
+\newcommand{\infinity}{$\infty$}
+
+\newcommand{\pzero}{\mathbin{0}}
+\newcommand{\seq}{\mathbin{\id{,}}}
+\newcommand{\all}{\mathbin{\id{\&}}}
+\newcommand{\choice}{\mathbin{\id{|}}}
+\newcommand{\altern}{\mathbin{\id{+}}}
+\newcommand{\juxtap}{\mathbin{\id{|}}}
+%\newcommand{\concat}{\mathbin{.}}
+\newcommand{\concat}{\Rightarrow}
+\newcommand{\punify}{\mathbin{\id{:=:}}}
+\newcommand{\fuse}{\mathbin{\id{=}}}
+\newcommand{\scong}{\mathbin{\equiv}}
+\newcommand{\nameeq}{\mathbin{\equiv_N}}
+\newcommand{\alphaeq}{\mathbin{\equiv_{\alpha}}}
+\newcommand{\names}[1]{\mathbin{\mathcal{N}(#1)}}
+\newcommand{\freenames}[1]{\mathbin{\mathcal{FN}(#1)}}
+\newcommand{\boundnames}[1]{\mathbin{\mathcal{BN}(#1)}}
+%\newcommand{\lift}[2]{\texttt{lift} \; #1 \concat #2}
+\newcommand{\binpar}[2]{#1 \juxtap #2}
+\newcommand{\outputp}[2]{#1 ! ( * #2 )}
+\newcommand{\prefix}[3]{#1 ? ( #2 ) \concat #3}
+\newcommand{\lift}[2]{#1 ! ( #2 )}
+%\newcommand{\quotep}[1]{\lpquote #1 \rpquote}
+\newcommand{\quotep}[1]{@#1}
+\newcommand{\dropn}[1]{*#1}
+
+\newcommand{\newp}[2]{\id{(}\newkw \; #1 \id{)} #2}
+\newcommand{\bangp}[1]{\int #1}
+\newcommand{\xbangp}[2]{\int_{#2} #1}
+\newcommand{\bangxp}[2]{\int^{#2} #1}
+
+\newcommand{\substp}[2]{\id{\{} \quotep{#1} / \quotep{#2} \id{\}}}
+\newcommand{\substn}[2]{\id{\{} #1 / #2 \id{\}}}
+
+\newcommand{\psubstp}[2]{\widehat{\substp{#1}{#2}}}
+\newcommand{\psubstn}[2]{\widehat{\substn{#1}{#2}}}
+
+\newcommand{\applyp}[2]{#1 \langle #2 \rangle}
+\newcommand{\absp}[2]{\id{(} #1 \id{)} #2}
+
+\newcommand{\transitions}[3]{\mathbin{#1 \stackrel{#2}{\longrightarrow} #3}}
+\newcommand{\meaningof}[1]{\ldb #1 \rdb}
+\newcommand{\pmeaningof}[1]{\ldb #1 \rdb}
+\newcommand{\nmeaningof}[1]{\ldrb #1 \rdrb}
+
+\newcommand{\Proc}{\mathbin{Proc}}
+\newcommand{\QProc}{\quotep{\mathbin{Proc}}}
+
+\newcommand{\entailm}{\mathbin{\vdash_{\mathfrak m}}} %matching
+\newcommand{\entailp}{\mathbin{\vdash_{\mathfrak p}}} %behavioral
+\newcommand{\entailv}{\mathbin{\vdash_{\mathfrak v}}} %validation
+\newcommand{\congd}{\mathbin{\equiv_{\mathfrak d}}}
+\newcommand{\congs}{\mathbin{\equiv_{\mathfrak s}}}
+\newcommand{\congp}{\mathbin{\equiv_{\mathfrak p}}}
+%\newcommand{\defneqls}{:\!=}
+\newcommand{\defneqls}{\coloneqq}
+%\newcommand{\logequiv}{\mathbin{\leftrightarrow}}
+
+\newcommand{\barb}[2]{\mathbin{#1 \downarrow_{#2}}}
+\newcommand{\dbarb}[2]{\mathbin{#1 \Downarrow_{#2}}}
+
+% From pi-duce paper
+\renewcommand{\red}{\rightarrow}
+\newcommand{\wred}{\Rightarrow}
+\newcommand{\redhat}{\hat{\longrightarrow}}
+\newcommand{\lred}[1]{\stackrel{#1}{\longrightarrow}} %transitions
+\newcommand{\wlred}[1]{\stackrel{#1}{\Longrightarrow}}
+
+\newcommand{\opm}[2]{\overline{#1} [ #2 ]} % monadic
+\newcommand{\ipm}[2]{{#1} ( #2 )} 
+\newcommand{\ipmv}[2]{{#1} ( #2 )} % monadic
+\newcommand{\parop}{\;|\;}    % parallel operator
+\newcommand{\patmatch}[3]{#2 \in #3 \Rightarrow #1}
+\newcommand{\sdot}{\, . \,}    % Space around '.'
+\newcommand{\bang}{!\,}
+%\newcommand{\fuse}[1]{\langle #1 \rangle}    
+\newcommand{\fusion}[2]{#1 = #2} % fusion prefix/action
+\newcommand{\rec}[2]{\mbox{\textsf{rec}} \, #1. \, #2}
+\newcommand{\match}[2]{\mbox{\textsf{match}} \; #1 \; \mbox{\textsf{with}} \; #2}
+\newcommand{\sep}{:}
+\newcommand{\val}[2]{\mbox{\textsf{val}} \; #1 \; \mbox{\textsf{as}} \; #2}
+
+\newcommand{\rel}[1]{\;{\mathcal #1}\;} %relation
+\newcommand{\bisim}{\stackrel{.}{\sim}_b} %bisimilar
+\newcommand{\wb}{\approx_b} %weak bisimilar
+\newcommand{\bbisim}{\stackrel{\centerdot}{\sim}} %barbed bisimilar
+\newcommand{\wbbisim}{\stackrel{\centerdot}{\approx}} %weak barbed bisimilar
+\newcommand{\wbbisimsem}{\approx} %weak barbed bisimilar
+\newcommand{\bxless}{\lesssim}  %expansion less (amssymb required)
+\newcommand{\bxgtr}{\gtrsim}  %expansion greater (amssymb required)
+\newcommand{\beq}{\sim}    %barbed congruent
+\newcommand{\fwbeq}{\stackrel{\circ}{\approx}}  %weak barbed congruent
+\newcommand{\wbeq}{\approx}  %weak barbed congruent
+\newcommand{\sheq}{\simeq}  %symbolic hypereq
+\newcommand{\wbc}{\approx_{cb}}
+
+% End piduce contribution
+
+% rho logic
+
+\newcommand{\ptrue}{\mathbin{true}}
+\newcommand{\psatisfies}[2]{#1 \models #2}
+\newcommand{\pdropf}[1]{\rpquote #1 \lpquote}
+\newcommand{\pquotep}[1]{\lpquote #1 \rpquote}
+\newcommand{\plift}[2]{#1 ! ( #2 )}
+\newcommand{\pprefix}[3]{\langle #1 ? #2 \rangle #3}
+\newcommand{\pgfp}[2]{\textsf{rec} \; #1 \mathbin{.} #2}
+\newcommand{\pquant}[3]{\forall #1 \mathbin{:} #2 \mathbin{.} #3}
+\newcommand{\pquantuntyped}[2]{\forall #1 \mathbin{.} #2}
+\newcommand{\riff}{\Leftrightarrow}
+
+\newcommand{\PFormula}{\mathbin{PForm}}
+\newcommand{\QFormula}{\mathbin{QForm}}
+\newcommand{\PropVar}{\mathbin{\mathcal{V}}}
+
+\newcommand{\typedby}{\mathbin{\:\colon}}
+\newcommand{\mixedgroup}[1]{\id{mixed($#1$)}}
+\newcommand{\cast}[2]{\id{CAST AS} \; #1 \; (#2)}
+\newcommand{\bslsh}{\mathbin{\id{\\}}}
+\newcommand{\bslshslsh}{\mathbin{\id{\\\\}}}
+\newcommand{\fslsh}{\mathbin{\id{/}}}
+\newcommand{\fslshslsh}{\mathbin{\id{//}}}
+\newcommand{\bb}[1]{\mbox{#1}}
+\newcommand{\bc}{\mathbin{\mathbf{::=}}}
+\newcommand{\bm}{\mathbin{\mathbf\mid}}
+\newcommand{\be}{\mathbin{=}}
+\newcommand{\bd}{\mathbin{\buildrel {\rm \scriptscriptstyle def} \over \be}}
+\newcommand{\ctcategory}[1]{\mbox{\bf #1}}
+
+%GRAMMAR
+\newlength{\ltext}
+\newlength{\lmath}
+\newlength{\cmath}
+\newlength{\rmath}
+\newlength{\rtext}
+
+\settowidth{\ltext}{complex type name}
+\settowidth{\lmath}{$xxx$}
+\settowidth{\cmath}{$::=$}
+\settowidth{\rmath}{\id{attributeGroup}}
+\settowidth{\rtext}{repetition of $g$ between $m$ and $n$ times}
+
+\newenvironment{grammar}{
+  \[
+  \begin{array}{l@{\quad}rcl@{\quad}l}
+  \hspace{\ltext} & \hspace{\lmath} & \hspace{\cmath} & \hspace{\rmath} & \hspace{\rtext} \\
+}{
+  \end{array}\]
+}
+
+% Over-full v-boxes on even pages are due to the \v{c} in author's name
+\vfuzz2pt % Don't report over-full v-boxes if over-edge is small
+
+% THEOREM Environments ---------------------------------------------------
+ \newtheorem{thm}{Theorem}[subsection]
+ \newtheorem{cor}[thm]{Corollary}
+ \newtheorem{lem}[thm]{Lemma}
+ \newtheorem{prop}[thm]{Proposition}
+% \theoremstyle{definition}
+ \newtheorem{defn}[thm]{Definition}
+% \theoremstyle{remark}
+ \newtheorem{rem}[thm]{Remark}
+ \newtheorem{example}[thm]{Example}
+ \numberwithin{equation}{subsection}
+% MATH -------------------------------------------------------------------
+ \DeclareMathOperator{\RE}{Re}
+ \DeclareMathOperator{\IM}{Im}
+ \DeclareMathOperator{\ess}{ess}
+ \newcommand{\veps}{\varepsilon}
+ \newcommand{\To}{\longrightarrow}
+ \newcommand{\h}{\mathcal{H}}
+ \newcommand{\s}{\mathcal{S}}
+ \newcommand{\A}{\mathcal{A}}
+ \newcommand{\J}{\mathcal{J}}
+ \newcommand{\M}{\mathcal{M}}
+ \newcommand{\W}{\mathcal{W}}
+ \newcommand{\X}{\mathcal{X}}
+ \newcommand{\BOP}{\mathbf{B}}
+ \newcommand{\BH}{\mathbf{B}(\mathcal{H})}
+ \newcommand{\KH}{\mathcal{K}(\mathcal{H})}
+ \newcommand{\Real}{\mathbb{R}}
+ \newcommand{\Complex}{\mathbb{C}}
+ \newcommand{\Field}{\mathbb{F}}
+ \newcommand{\RPlus}{\Real^{+}}
+ \renewcommand{\Polar}{\mathcal{P}_{\s}}
+ \newcommand{\Poly}{\mathcal{P}(E)}
+ \newcommand{\EssD}{\mathcal{D}}
+ \newcommand{\Lom}{\mathcal{L}}
+ \newcommand{\States}{\mathcal{T}}
+ \newcommand{\abs}[1]{\left\vert#1\right\vert}
+% \newcommand{\set}[1]{\left\{#1\right\}}
+%\newcommand{\seq}[1]{\left<#1\right>}
+ \newcommand{\norm}[1]{\left\Vert#1\right\Vert}
+ \newcommand{\essnorm}[1]{\norm{#1}_{\ess}}
+
+%%% NAMES
+\newcommand{\Names}{{\mathcal N}}
+\newcommand{\Channels}{{\sf X}}
+\newcommand{\Variables}{{\mathcal V}}
+\newcommand{\Enames}{{\mathcal E}}
+\newcommand{\Nonterminals}{{\mathcal S}}
+\newcommand{\Pnames}{{\mathcal P}}
+\newcommand{\Dnames}{{\mathcal D}}
+\newcommand{\Types}{{\mathcal T}}
+
+\newcommand{\fcalc}{fusion calculus}
+\newcommand{\xcalc}{${\mathfrak x}$-calculus}
+\newcommand{\lcalc}{$\lambda$-calculus}
+\newcommand{\pic}{$\pi$-calculus}
+\newcommand{\rhoc}{${\textsc{rho}}$-calculus}
+\newcommand{\hcalc}{highwire calculus}
+\newcommand{\dcalc}{data calculus}
+%XML should be all caps, not small caps. --cb
+%\newcommand{\xml}{\textsc{xml}}
+\newcommand{\xml}{XML} 
+
+\newcommand{\papertitle}{Linear types can change the blockchain!}
+% use static date to preserve date of actual publication
+ \newcommand{\paperversion}{Draft Version 0.1 - Jan 7, 2015}
+
+\newenvironment{toc}
+{
+\begin{list}{}{
+   \setlength{\leftmargin}{0.4in}
+   \setlength{\rightmargin}{0.6in}
+   \setlength{\parskip}{0pt}
+ } \item }
+{\end{list}}
+
+\newenvironment{narrow}
+{
+\begin{list}{}{
+   \setlength{\leftmargin}{0.4in}
+   \setlength{\rightmargin}{0.6in}
+ } \item }
+{\end{list}}
+
+%%% ----------------------------------------------------------------------
+
+%\title{\huge{\papertitle}}
+\title{\papertitle}
+
+%\numberofauthors{3}
+\author{
+L.G. Meredith\\
+  \affaddr{Biosimilarity, LLC}\\
+  \email{\fontsize{8}{8}\selectfont lgreg.meredith@biosimilarity.com}
+}
+
+%\address{Systems Biology, Harvard Medical School, Boston, Massachussetts, USA}
+
+%\email{lg_meredith@hms.harvard.edu}
+
+%\thanks{This work was completed during a visiting appointment at the Department of Systems Biology, Harvard Medical School.}
+
+%\subjclass{Primary 47A15; Secondary 46A32, 47D20}
+
+%\date{April 6, 2002.}
+
+%\dedicatory{}
+
+%\commby{Daniel J. Rudolph}
+
+%%% ----------------------------------------------------------------------
+
+\begin{document}
+%\lstset{language=erlang}
+\lstset{language=}
+
+%These margin values appear to be relative to the bigpage package settings. --cb
+\setlength{\topmargin}{0in}
+\setlength{\textheight}{8.5in}
+\setlength{\parskip}{6pt}
+
+\keywords{ linear logic, blockchain, types, Curry-Howard }
+
+\begin{abstract}
+\normalsize{ 
+
+  We present an interpretation of classical linear logic in terms of operations on the blockchain.
+
+}
+
+\end{abstract}
+
+% \noindent
+% {\large \textbf{Submission to arXiv}}\\
+% \rule{6.25in}{0.75pt}\\\\\\
+
+%%% ----------------------------------------------------------------------
+\maketitle
+%%% ----------------------------------------------------------------------
+
+% \begin{center}
+% \paperversion\\
+% \end{center}
+
+% \begin{toc}
+% \tableofcontents
+% \end{toc}
+
+% \newpage
+% ------------------------------------------------------------------------
+
+\section{Background and Motivation}
+
+i've had a lot of time to think this week because i’ve been waiting on
+machines to synchronize with the blockchain. As a result, i’ve been
+more motivated than ever to find a scalable and reliable architecture
+for the blockchain. i believe i'm getting closer to a way to explain
+and test a hypothesis that linear proofs provide the basis for a much
+more scalable architecture for the blockchain. For background on what
+i mean by linear proofs, here's a paper that interprets them in terms
+of games, and here’s another that interprets them in terms of
+traditional computational calculi like the lambda calculus.
+
+A linear proof is a formal structure representing a proof of a formula
+in linear logic.  The Curry-Howard isomorphism tells us that formulae
+are types (as in data types in a programming language), and that
+proofs are programs. This is a very broad and deep idea. In the 90’s,
+for example, Abramsky extended it to proofs as processes, which Wadler
+was only very recently able to realize as a correspondence between
+linear proofs and π-calculus processes. In this context it means that
+linear proofs provide a representation of both data (blocks) and
+program (executable transactions) that gives several advantages over
+the current choices made by the blockchain.
+
+The blockchain is a great example of data that is also program; it’s a
+giant ledger spread out over the Internet, that’s made of a bunch of
+distributed, but interacting servers. To become more scalable, and
+reliable, both ledger and servers will need certain characteristics of
+data/program that have to do with a property called
+compositionality. Scalability is always all about being able to build
+composite systems from components. For example, if we can prove that
+sections of the blockchain can be safely isolated from other sections,
+for example, if all blocks necessary to prove that Alice has
+sufficient funds to send M btc to Betty, can be isolated from the
+blocks necessary to prove that Alfred has sufficient funds to send N
+btc to Bob, then Alice and Betty, and Alfred and Bob can safely work
+with projections of the blockchain, and thus complete their
+transactions, not only in isolation of each other, but without the
+onerous need to sync the entire blockchain.
+
+One analogy is the use of separation logic (a child of linear logic)
+to prove things about the structure of the heap which can, in turn, be
+used to guarantee that two threads can operate at the same time
+safely. The blockchain is like the heap. The Alice - Betty and Alfred
+- Bob transactions are like the two threads. A proof that the heap is
+of the form H1 * H2 together with a proof that T1 : H1 -> H1', T2 : H2
+-> H2' constitutes a proof that T1 * T2 (thread T1 running
+concurrently with T2) operate effectively in isolation and thus
+safely. Likewise, a proof that the blockchain is of the form B1 * B2
+(none of the transactions in B1 connect to addresses in B2 and vice
+versa), together with a proof that AliceBettyTxn : B1 -> B1' (this txn
+uses only addresses in B1), and AlfredBobTxn : B2 -> B2' (this txn
+uses only addresses in B2) constitutes a proof that AliceBettyTxn *
+AlfredBobTxn can operate with isolated projections of the blockchain.
+
+If the blockchain is built using the primitives of linear logic, it
+becomes easier and easier to construct these proofs, but also to
+construct the blockchain, itself, in terms of smaller blockchains.
+
+\section{Interpreting Linear Proofs as Operations on the Blockchain}
+Here's the most basic interpretation.
+
+\begin{mathpar}
+  \inferrule* {} {\vdash 1blkchnaddr : A \otimes \ldots \otimes A} %( with N occurrences of A )
+\end{mathpar}
+
+is a statement that there are $N$ $A$'s available at the address,
+$1blkchnaddr$. $A$'s can be any resource, BTC's, AMP's, DogeCoin, etc.
+
+\begin{mathpar}
+  \inferrule* {} {\vdash txn : A \otimes \ldots \otimes A \multimap B \otimes \ldots \otimes B %( with N occurrences of A in A * ... * A and M occurrences of B in B * ... * B )
+\end{mathpar}
+
+is a statement that $txn$ will generate $M$ $B$'s if provided $N$ $A$'s.
+
+Terminologically, we say that $1blkchnaddr$ is a \emph{witness} or a
+\emph{proof} of $A \otimes \ldots \otimes A$, and similarly, that $txn$
+is a witness or proof of $A \otimes \ldots \otimes A \multimap B \otimes \ldots \otimes B$. Given two such
+proofs we can use the cut rule of linear logic to produce a proof
+
+\begin{mathpar}
+  \inferrule* {} {\vdash txn( 1blkchnaddr ) : B \otimes \ldots \otimes B}
+\end{mathpar}
+
+where $txn( 1blkchnaddr )$ is a new address in the blockchain
+constructed from the information in txn together with
+$1blkchnaddr$. This should look remarkably like function application,
+because it is.
+
+Notice that now we can see, recursively, what a proof of a statement like 
+
+\begin{mathpar}
+  \inferrule* {} {\vdash 1blkchnaddr : A \otimes \ldots \otimes A}
+\end{mathpar}
+
+looks like. In most cases it will be a proof made from a previous
+application of the cut rule.  This tree of cuts will trace all the way
+back to some genesis block -- which is the only other way to have a
+proof of a statement like
+
+\begin{mathpar}
+  \inferrule* {} {\vdash 1blkchnaddr : A \otimes \ldots \otimes A}
+\end{mathpar}
+
+Now, where does the return address associated with $txn( 1blkchnaddr )$ come from?
+
+To see this we have to look into the mechanics of $\multimap$ (called
+linear implication or, more affectionately, lollipop).
+
+\begin{equation*}
+  A \multimap B = A^{\perp} \parr B
+\end{equation*}
+
+Linear implication is decomposed much like classical implication in
+terms of a negation and a disjunctive connective. It is literally an
+expression capturing the sentiment we need $A$ to get $B$, or $B$
+comes with a cost of $A$. The use of a proof rule for these kinds of
+links looks like
+
+\begin{mathpar}
+  \inferrule* {\vdash G, 1blkchnaddr : A^{\perp}, 2blkchnaddr : B}{\vdash G, txn( 1blkchnaddr, 2blkchnaddr ) : A^{\perp} \parr B}
+\end{mathpar}
+
+where we snuck in the rest of the blockchain as $G$. As we saw above, $A^{\perp} \parr B = A \multimap B$; so, we can write
+
+\begin{mathpar}
+  \inferrule* {\vdash G, 1blkchnaddr : A^{\perp}, 2blkchnaddr : B}{\vdash G, txn( 1blkchnaddr, 2blkchnaddr ) : A \multimap B}
+\end{mathpar}
+
+Now we see that forming a $txn$ comes with the requirement to provide an
+address where $A$'s will be sent and an address where $B$'s will be
+received. Expanding on these intuitions, we can see that the rules of
+classical linear logic correspond exactly to a specification of
+operations on the blockchain.
+
+\subsection{Linear Sequents}
+
+In more detail, a proof rule in linear logic is usually written in
+terms of a transformation,
+
+\begin{mathpar}
+  \inferrule* {S_1, S_2, \ldots, S_N} {S}
+\end{mathpar}
+
+taking \emph{sequent}s $S_1, \ldots, S_N$ to a \emph{sequent} $S$, where
+a sequent is of the form
+
+\begin{mathpar}
+  \inferrule* {} {\vdash G, t_1 : A_1, \ldots, t_N : A_N}
+\end{mathpar}
+
+A sequent is really just a statement about what is distributed where in an instance of the blockchain.
+
+\begin{itemize}
+  \item $t_1, \ldots, t_N$ are either addresses or programs that take addresses as input; they constitute the "focus" of the proof rule, or where the action is going to happen.
+  \item $A_1, \ldots, A_N$ are (types built from) the different types of coin
+  \item $G$ is the rest of the blockchain -- it is necessary to establish the distribution of resources we see at $t_1, \ldots, t_N$, but it's not the focus of the operation of the proof rule. 
+\end{itemize}
+
+Putting it all together, a proof rule of the form
+
+\begin{mathpar}
+  \inferrule* {S_1} {S_2}
+\end{mathpar}
+
+is then a statement about how the blockchain in state $S_1$ goes to a
+blockchain in state $S_2$. If you think about it, that's just what we
+need to reason about transactions. In a transaction where Alice sends
+Betty $N$ coin, we can think of the transaction as a rule that takes a
+blockchain in a state where Alice has $N$ btc to a blockchain in a
+state where Betty has $N$ btc.
+
+\subsection{The Multiplicatives}
+Linear logic, however, allows to build bigger blockchains from smaller
+ones, and manages the dependency and information flow so that
+everything remains consistent. Here's an example. The proof rule for
+the tensor $A \otimes B$ looks like this
+
+\begin{mathpar}
+  \inferrule* {\vdash G, t : A,  \vdash H, u : B}{\vdash G, H, t \otimes u : A \otimes B}
+\end{mathpar}
+
+It says that if you have one blockchain, $\vdash G, t : A$, and
+another completely independent blockchain, with a totally separate
+address space, $\vdash H, u : B$, then you can make a new one
+
+\begin{mathpar}
+  \inferrule* {} {|- G, H, t \otimes u : A \otimes B}
+\end{mathpar}
+
+in which you just combine all the data of assignments of addresses to
+resources in $G$ and $H$ in one big blockchain, $G,H$, and you can make a
+kind of composite address (or program), $t \otimes u$, at which can be found
+the combined $A \otimes B$ resource.
+
+Now, comparison of the par ( $A \parr B$ ) rule, which establishes transaction links, is even more illuminating.
+
+\begin{mathpar}
+  \inferrule* {\vdash G, t : A, u : B}{ G, t \parr u : A \parr B }
+\end{mathpar}
+
+This rule insists that the transaction link,  $t \parr u$, is made in the same piece of the blockchain, $G$.
+
+The fragment of linear logic that includes, $A^{\perp}$, $A \otimes
+B$, $A \parr B$, $A \multimap B$, is called the multiplicative
+fragment of linear logic, or MLL. It talks about the basics of
+transactions, loading up addresses with resources and establishing
+dependencies between addresses, essentially recording transaction
+history. However, it does so in a way that keeps track of how the
+blockchain itself is segmented. This allows us to determine things
+like how much of the blockchain do i have to see in order to safely
+conduct this transaction, or can i conduct this transaction without
+needing visibility into that region of the blockchain.
+
+\subsection{The Additives}
+
+Linear logic also enjoys another fragment, called the additives. This
+aspect of the logic is all about conditionals and contingencies, this
+or that, but not both. The linear logic connective called 'with', and
+denoted $A \with B$, collects options together into a menu for subsequent
+selection by interaction with choices indicated by the linear
+connective 'plus', $A + B$. In symbols,
+
+\begin{mathpar}
+  \inferrule* {\vdash G, t : A, u : B}{\vdash G, t \with u : A \with B}
+\end{mathpar}
+
+while 
+
+\begin{mathpar}
+  \inferrule* {\vdash G, t : A}{ inl( t ) : A + B }
+\end{mathpar}
+
+and
+
+\begin{mathpar}
+  \inferrule* {G, u : B}{inr( u ) : A + B}
+\end{mathpar}
+
+If during a more complex transaction $t \with u$ gets tied to $inl( t'
+)$, via $txn( t \with u, inl( t' ) )$, then this will reduce to a
+transaction of the form $txn( t, t' )$. On the other hand, $txn( t
+\with u, inr( u' ) )$ will reduce to a transaction of the form $txn(
+u, u' )$.
+
+\subsection{The Exponentials}
+
+The fragment of linear logic that includes the multiplicative and
+additive connectives is called MALL. The remaining connectives are
+called the exponentials, $?A$, and $!A$. They denote copyable,
+non-conserved resources. When we write $\vdash G, t : !A$, we are
+saying that you can get as many $A$'s from the address (or program)
+$t$ as you want. Thus, unlike currency, that address is linked to a
+copyable resource like a document, or a jpeg, or audio file, or
+... that can be shared widely. When we write $\vdash G, t : ?A$, we
+are saying that you can put as many $A$'s into the address (or
+program) $t$ as you want. You can think of it as a place to store
+$A$'s, or discard them.
+
+What’s critically important about the use of the exponentials is that
+they mark resources that ought not to stay on the blockchain. They
+indicate content and content types that can be better served by a
+different kind of content delivery network. This is another important
+function in helping with a scalable blockchain -- use blockchain
+technology where it makes sense and use other means where it doesn’t.
+
+Taken all together, we have an interpretation of full classical linear
+logic in terms of operations on the blockchain.
+
+\section{Conclusions and Future Work}
+
+We have developed a view of full classical linear logic in terms of
+operations against the blockchain. The view we have been developing
+not only extends to provide a meaningful interpretation of full
+classical linear logic to natural and intuitive operations on the
+blockchain, it also extends and expands how we think about the
+blockchain and what transactions on it are. Additionally, it provides
+guarantees, mathematical certainties about the correctness of
+transactions structured and executed this way. In particular, notice
+that we focused mostly on the connectives governing $A$'s and $B$'s (the
+resources to be found at addresses or programs). We didn't really talk
+about the structure of $t$'s and $u$'s. These provide us with a simple and
+intuitive syntax for transactions. Of equal importance, these
+transactions are \emph{typed} programs. When we write $\vdash G, t : A$, we are
+not only saying something about the resources produced or manipulated
+by $t$, we are saying something about how t can be used, and in what
+blockchain context we can expect t to perform correctly.
+
+Understood this way, the blockchain interpretation gives new meaning
+and perspective on some theorems from the linear logic literature. In
+particular, it is well established that there is a natural notion of
+execution of $t$'s. That is, when thought of as programs, we know how
+to run them. When they are well typed, that is, if we have established
+$\vdash t : A$, then $t$ is \emph{terminating}. That’s a theorem from
+Abramsky’s computational interpretations of linear logic. What this
+means for the blockchain is that proof terms and their linear
+connectives provide a scripting language for transactions that, on the
+one hand, provides termination for all well typed scripts, and on the
+other is highly expressive. Further, if it turns out that this
+scripting language is not expressive enough, then there is a natural
+extension of proof terms via a correspondence between linear proof
+terms and {$\pi$}-calculus processes that we mentioned at the top of these
+notes.
+
+
+\begin{tabular}{c|c}
+  proof term & blockchain meaning \\
+  address & address \\
+  $t * u$ & isolated concurrent transactions \\
+  $t # u$ & interacting or linked concurrent transactions \\
+  $t \with u$ & menu of transaction options \\
+  $inl( t ), inr( u )$ & transaction option selection \\
+  $!t$ & copyable resource server \\
+  $?t$ & copyable resource storage \\
+  $txn( t, u )$ & joined transactions\\
+\end{tabular}
+
+This correspondence is not just useful for extending a scripting
+language for blockchain transactions. It turns out the
+{$\pi$}-calculus the premier formalism for specifying, reasoning
+about, and executing protocols in distributed systems. Since one of
+the real values of the blockchain is the fact that it is a distributed
+means to conduct transactions, the need to tie this formalism to one
+for specifying protocols in distributed systems is plain.
+
+\subsection{Proof-of-work}
+
+The glaring lacunae in this discussion is, of course, the relationship
+to proof-of-work. Consider the following example. Suppose $C_1$ and $C_2$
+are blockchains both of height $N$.
+
+\begin{equation*}
+  \begin{aligned}
+    C_1 = B_{1N} \leftarrow B_{1N-1} \leftarrow \ldots \leftarrow B_{10} \\
+    C_2 = B_{2N} \leftarrow B_{2N-1} \leftarrow \ldots \leftarrow B_{20}
+  \end{aligned}
+\end{equation*}
+
+We can define
+
+\begin{equation*}
+  C_1 \otimes C_2 = ( B_{1N} \otimes B_{2N} ) \leftarrow ( B_{1N-1} * B_{2N-1} ) \leftarrow \ldots \leftarrow ( B_{10} * B_{20} )
+\end{equation*}
+
+Note that it is insufficient merely to guarantee for $B \otimes B$’ that all
+the transactions in $B$ are isolated from the transactions in $B$’. The
+counterexample is
+
+\begin{equation*}
+  \begin{aligned}
+    C_1 = Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr } \leftarrow Block{ 1BobAddr \rightarrow^{7btc} 1BettyAddr } \\
+    C_2 = Block{ 1BobAddr \rightarrow^{7btc} 1BettyAddr } \leftarrow Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr }
+  \end{aligned}
+\end{equation*}
+
+Clearly $B_{11}$ is isolated from $B_{21}$, and $B_{10}$ is isolated
+from $B_{20}$; but, $B_{20}$ is not isolated from $B_{11}$, and
+$B_{10}$ is not isolated from $B_{21}$. As a result, the spends in the
+earlier blocks could impact the spends in the later blocks.
+
+Instead, the entire address space of $C_1$ must be isolated from
+$C_2$. In this case the network of servers, $N_1$, that maintain $C_1$ can
+be safely combined with the network of servers, $N_2$, that maintain $C_2$,
+and we can safely define the composite chain as above. The
+proof-of-work protocol organizing $N_1$ is completely separate from that
+in $N_2$. They do not interact. Yet, it is safe to combine the chains
+using a glorified zip function. In this example,
+
+\begin{equation*}
+  \begin{aligned} 
+    C_1 = Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr } \leftarrow Block{ 2BobAddr \rightarrow^{7btc} 2BettyAddr }
+    C2 = Block{ 1BobAddr \rightarrow^{7btc} 1BettyAddr } \leftarrow Block{ 2AliceAddr \rightarrow^{5btc} 2AllanAddr }
+  \end{aligned}
+\end{equation*}
+
+The address spaces of these chains are completely isolated (often
+written $addresses( C_1 ) # addresses( C_2 )$ ). We are free to calculate
+
+\begin{equation*}
+  \begin{aligned} 
+    C_1 \otimes C_2 \\
+    & = \\
+    Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr } \otimes Block{ 1BobAddr \rightarrow^{7btc} 1BettyAddr }  \\
+    & \leftarrow Block{ 2BobAddr \rightarrow^{7btc} 2BettyAddr } \otimes Block{ 2AliceAddr \rightarrow^{5btc} 2AllanAddr }
+    & = \\
+    Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr ; 1BobAddr \rightarrow^{7btc} 1BettyAddr } \\
+    & \leftarrow Block{ 2BobAddr \rightarrow^{7btc} 2BettyAddr ; 2AliceAddr \rightarrow^{5btc} 2AllanAddr }
+  \end{aligned}
+\end{equation*}
+
+The ordering of transactions provided by the two independently
+executing proof-of-work protocols is combined in a completely safe.
+
+Note that there are at least two possible interpretations of $C_1 *
+C_2$. One is that the requirement is to verify that $addresses( C_1 ) #
+addresses( C_2 )$. Another is to ensure this is the case by rewiring the
+transactions. Under this latter interpretation even the counterexample
+becomes safe
+
+\begin{equation*}
+  \begin{aligned} 
+    C_1 \otimes C_2 \\
+    & = \\
+    Block{ 1AliceAddr \rightarrow^{5btc} 1AllanAddr } \otimes Block{ 1BobAddr \rightarrow^{7btc} 1BettyAddr } \\
+    & <- Block{ 1BobAddr \rightarrow^{7btc} 01BettyAddr } * Block{ 1AliceAddr \rightarrow^{5btc} 11AllanAddr } \\
+    & = \\
+    Block{ 01AliceAddr \rightarrow^{5btc} 01AllanAddr ; 11BobAddr \rightarrow^{7btc} 11BettyAddr } \\
+    & \leftarrow Block{ 01BobAddr \rightarrow^{7btc} 01BettyAddr ; 11AliceAddr \rightarrow^{5btc} 11AllanAddr }
+  \end{aligned}
+\end{equation*}
+
+There is much more to be said, but that must be left to a later revision!
+
+\paragraph{Acknowledgments}
+We would like to acknowledge Vlad Zamfr for asking some thoughtful
+and stimulating conversation about the blockchain protocol.
+
+% ------------------------------------------------------------------------
+%GATHER{Xbib.bib}   % For Gather Purpose Only
+%GATHER{Paper.bbl}  % For Gather Purpose Only
+\bibliographystyle{amsplain}
+\bibliography{ltcctbc}
+
+% ------------------------------------------------------------------------
+
+
+
+% ------------------------------------------------------------------------
+
+\end{document}
+% ------------------------------------------------------------------------

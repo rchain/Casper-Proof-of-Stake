@@ -1,0 +1,3 @@
+latex hctm
+dvips hctm.dvi
+ps2pdf hctm.ps
