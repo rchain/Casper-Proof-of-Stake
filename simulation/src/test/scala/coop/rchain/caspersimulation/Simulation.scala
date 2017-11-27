@@ -2,7 +2,7 @@ package coop.rchain.caspersimulation
 
 import coop.rchain.caspersimulation.block.{Block, Genesis}
 import coop.rchain.caspersimulation.identity.IdFactory
-import coop.rchain.caspersimulation.network.{Synchronous, UniformRandomDelay}
+import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
 import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow}
 import coop.rchain.caspersimulation.strategy.{Human, ThresholdSpender}
@@ -13,7 +13,6 @@ object Simulation {
     val maxTimeSteps: Int = 100
 
     val network = UniformRandomDelay(5)
-    //val network = Synchronous
 
     val reporter = new PoliticalCapitalFlow() and new RevFlow()
 
