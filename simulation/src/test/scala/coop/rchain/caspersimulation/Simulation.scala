@@ -4,35 +4,47 @@ import coop.rchain.caspersimulation.block.{Block, Genesis}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
-import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow}
-import coop.rchain.caspersimulation.strategy.{Human, ThresholdSpender}
+import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, Reportable, RevFlow}
+import coop.rchain.caspersimulation.strategy.evolution.EvolutionarySimulation
+import coop.rchain.caspersimulation.strategy.{Strategy, ThresholdSpender}
+
+import scala.util.Random
 
 object Simulation {
   def main(args: Array[String]): Unit = {
     implicit val idf: IdFactory = new IdFactory
-    val maxTimeSteps: Int = 100
-
+    val rounds: Int = 100
     val network = UniformRandomDelay(5)
+    val reporter = PoliticalCapitalFlow and RevFlow
+    val numValidators = 10
 
-    val reporter = new PoliticalCapitalFlow() and new RevFlow()
+    val fitness = (v: Validator) => {
+      v.revEarned
+    }
 
-    network.createUser
+    val random = new Random()
+    def gaussian(mean: Double, sd: Double): Double = random.nextGaussian() * sd + mean
+    def delta: PoliticalCapital = new PoliticalCapital(
+      gaussian(0d, 0.5d)
+    )
+    val mutator: (Strategy) => Strategy = {
+      case t: ThresholdSpender => ThresholdSpender(t.threshold + delta)
+      case s => s
+    }
 
-    //network.createValidator(Human)
-    //network.createValidator(Human)
-    val pc1 = new PoliticalCapital(Block.f * Block.f * Genesis.pca.amount)
-    val pc2 = new PoliticalCapital(Block.f * Genesis.pca.amount) //probs the best
-    val pc3 = new PoliticalCapital(2d * Block.f * Genesis.pca.amount)
-    network.createValidator(ThresholdSpender(pc1))
-    network.createValidator(ThresholdSpender(pc2))
-    network.createValidator(ThresholdSpender(pc3))
+    val sim = EvolutionarySimulation(
+      network, rounds, reporter,
+      fitness, mutator, "./output/evolution"
+    )
 
-    Iterator.range(0, maxTimeSteps).foreach(i => {
-      reporter.update(network)
-      println(i)
-    })
-    reporter.write("./output/")
+    val initValidators = Iterator.range(0, numValidators)
+      .map(_ => gaussian(Block.f * Genesis.pca.amount, 2d * Block.f))
+      .map(new PoliticalCapital(_))
+      .toSet
+      .map((t: PoliticalCapital) => Validator(ThresholdSpender(t), network))
 
-    println(s"The winner is: ${network.validators.maxBy(_.revEarned)}")
+    sim.init(initValidators)
+    sim.timeStep()
+
   }
 }

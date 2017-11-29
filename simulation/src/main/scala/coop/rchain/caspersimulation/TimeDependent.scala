@@ -1,4 +1,4 @@
-package coop.rchain.caspersimulation.network
+package coop.rchain.caspersimulation
 
 import coop.rchain.caspersimulation.identity.IdFactory
 

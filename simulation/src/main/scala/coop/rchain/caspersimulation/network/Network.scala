@@ -1,7 +1,7 @@
 package coop.rchain.caspersimulation.network
 
 import coop.rchain.caspersimulation.identity.IdFactory
-import coop.rchain.caspersimulation.{User, Validator}
+import coop.rchain.caspersimulation.{TimeDependent, User, Validator}
 import coop.rchain.caspersimulation.protocol.Message
 import coop.rchain.caspersimulation.strategy.Strategy
 
@@ -16,5 +16,12 @@ abstract class Network extends TimeDependent[Unit] {
   def createValidator(strategy: Strategy)(implicit idf: IdFactory): Unit = validators.add(Validator(strategy, this))
   def addValidator(validator: Validator): Unit = validators.add(validator)
 
+  final def reset(): Unit = {
+    users.clear()
+    validators.clear()
+    resetMessages()
+  }
+
   def send(m: Message): Unit
+  protected def resetMessages(): Unit
 }

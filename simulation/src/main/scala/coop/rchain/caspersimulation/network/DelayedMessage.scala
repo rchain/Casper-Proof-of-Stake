@@ -1,6 +1,6 @@
 package coop.rchain.caspersimulation.network
 
-import coop.rchain.caspersimulation.Validator
+import coop.rchain.caspersimulation.{TimeDependent, Validator}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.protocol.Message
 

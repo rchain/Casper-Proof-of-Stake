@@ -25,8 +25,8 @@ abstract class ValidatorScalarFlow[S] extends Reportable[Unit, Network, Map[Vali
     })
   }
 
-  override def write(outputPath: String): Unit = {
-    val outputFile: String = outputPath + filename
+  override def write(outputPath: String, suffix: String): Unit = {
+    val outputFile: String = s"$outputPath/${filename}_$suffix.csv"
     val out: PrintWriter = new PrintWriter(outputFile)
     toCsv.foreach(row => out.println(row))
     out.close()
