@@ -1,14 +1,14 @@
-package coop.rchain.caspersimulation
+package coop.rchain.caspersimulation.examples
 
 import coop.rchain.caspersimulation.block.{Block, Genesis}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
 import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow}
-import coop.rchain.caspersimulation.strategy.{Human, ThresholdSpender}
+import coop.rchain.caspersimulation.strategy.ThresholdSpender
 import coop.rchain.caspersimulation.visualization.Gephi
 
-object Simulation {
+object DagImagesOutput {
   def main(args: Array[String]): Unit = {
     implicit val idf: IdFactory = new IdFactory
     val maxTimeSteps: Int = 100
@@ -48,4 +48,5 @@ object Simulation {
 
     println(s"The winner is: ${network.validators.maxBy(_.revEarned)}")
   }
+
 }
