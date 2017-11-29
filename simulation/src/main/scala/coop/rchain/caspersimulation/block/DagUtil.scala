@@ -7,8 +7,9 @@ import scala.collection.mutable
 
 object DagUtil {
 
-  private def filter(blocks: IndexedSeq[Block], f: (Block) => Iterable[Block]): Set[Block] = {
-    val result = mutable.HashSet(blocks: _*)
+  private def filter(blocks: Iterable[Block], f: (Block) => Iterable[Block]): Set[Block] = {
+    val result = mutable.HashSet.empty[Block]
+    blocks.foreach(p => result.add(p))
     if (result.size > 1) result.remove(Genesis)
 
     blocks.foreach(b => {
@@ -20,7 +21,7 @@ object DagUtil {
   }
 
   //find blocks which are not the parent of any other known block
-  def heads(blocks: IndexedSeq[Block]): Set[Block] = filter(blocks, _.parents)
+  def heads(blocks: Iterable[Block]): Set[Block] = filter(blocks, _.parents)
 
   //find blocks which are not justified by any other known block
   def unjustified(blocks: IndexedSeq[Block]): Set[Block] = filter(blocks, _.justification)
