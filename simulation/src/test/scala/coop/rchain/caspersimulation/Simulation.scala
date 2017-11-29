@@ -6,6 +6,7 @@ import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
 import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow}
 import coop.rchain.caspersimulation.strategy.{Human, ThresholdSpender}
+import coop.rchain.caspersimulation.visualization.Gephi
 
 object Simulation {
   def main(args: Array[String]): Unit = {
@@ -27,11 +28,23 @@ object Simulation {
     network.createValidator(ThresholdSpender(pc2))
     network.createValidator(ThresholdSpender(pc3))
 
+    Gephi.initialize(network.validators.size)
     Iterator.range(0, maxTimeSteps).foreach(i => {
       reporter.update(network)
+
+      Gephi.addBlocks(network.validators.flatMap(_.state.blockHist))
+      Gephi.formatGraph()
+      Gephi.layoutGraph(0.5)
+      Gephi.export("./output/img", "png", indexed = true)
+
       println(i)
     })
     reporter.write("./output/")
+
+    Gephi.formatGraph()
+    Gephi.layoutGraph(10)
+    Gephi.export("./output", "pdf")
+
 
     println(s"The winner is: ${network.validators.maxBy(_.revEarned)}")
   }
