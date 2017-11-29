@@ -6,9 +6,9 @@ import coop.rchain.caspersimulation.network.Network
 import coop.rchain.caspersimulation.reporting.Reportable
 import coop.rchain.caspersimulation.strategy.Strategy
 
-case class EvolutionarySimulation[T](network: Network,
+case class EvolutionarySimulation(network: Network,
                                      rounds: Int,
-                                     reporter: Reportable[Unit, Network, T],
+                                     reporter: Reportable[Unit, Network, _],
                                      fitness: (Validator) => Double,
                                      mutator: (Strategy) => Strategy,
                                      outputPath: String) extends TimeDependent[Unit] {

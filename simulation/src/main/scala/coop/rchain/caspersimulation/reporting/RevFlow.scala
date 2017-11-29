@@ -8,8 +8,8 @@ object RevFlow extends ValidatorScalarFlow[Double] {
     input.validators.map(v => v -> v.revEarned).toMap
   }
 
-  override def filename: String = "RevFlow"
+  override val filename: String = "RevFlow"
 
-  override def header: String = "validator,round,rev"
+  override val header: String = "validator,round,rev"
 
 }

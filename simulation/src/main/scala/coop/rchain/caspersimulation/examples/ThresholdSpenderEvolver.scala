@@ -1,16 +1,17 @@
-package coop.rchain.caspersimulation
+package coop.rchain.caspersimulation.examples
 
+import coop.rchain.caspersimulation.Validator
 import coop.rchain.caspersimulation.block.{Block, Genesis}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
-import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, Reportable, RevFlow}
-import coop.rchain.caspersimulation.strategy.evolution.EvolutionarySimulation
+import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow, StrategyDistributionFlow}
 import coop.rchain.caspersimulation.strategy.{Strategy, ThresholdSpender}
+import coop.rchain.caspersimulation.strategy.evolution.EvolutionarySimulation
 
 import scala.util.Random
 
-object Simulation {
+object ThresholdSpenderEvolver {
   def main(args: Array[String]): Unit = {
     implicit val idf: IdFactory = new IdFactory
     val rounds: Int = 100
@@ -44,7 +45,16 @@ object Simulation {
       .map((t: PoliticalCapital) => Validator(ThresholdSpender(t), network))
 
     sim.init(initValidators)
-    sim.timeStep()
+
+    val distTracker = StrategyDistributionFlow(
+      (t: ThresholdSpender) => t.threshold.amount,
+      "thresholdDist"
+    )
+
+    Iterator.range(0, 2).foreach(_ => {
+      distTracker.update(sim)
+    })
+    distTracker.write("./output", "")
 
   }
 }

@@ -5,10 +5,9 @@ import java.io.PrintWriter
 import coop.rchain.caspersimulation.Validator
 import coop.rchain.caspersimulation.network.Network
 
-abstract class ValidatorScalarFlow[S] extends Reportable[Unit, Network, Map[Validator, S]] {
+abstract class ValidatorScalarFlow[S] extends CsvReportable[Unit, Network, Map[Validator, S]] {
 
-  def filename: String
-  def header: String
+  val header: String
 
   final def toCsv: IndexedSeq[String] = {
     val rounds: IndexedSeq[Int] = observations.keys.toIndexedSeq.sorted

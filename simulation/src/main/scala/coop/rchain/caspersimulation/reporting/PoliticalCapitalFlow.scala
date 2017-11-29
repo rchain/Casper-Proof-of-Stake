@@ -10,8 +10,8 @@ object PoliticalCapitalFlow extends ValidatorScalarFlow[PoliticalCapital] {
     network.validators.map(v => v -> v.state.pc).toMap
   }
 
-  override def filename: String = "PCFlow"
+  override val filename: String = "PCFlow"
 
-  override def header: String = "validator,round,pc"
+  override val header: String = "validator,round,pc"
 
 }
