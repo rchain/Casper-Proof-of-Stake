@@ -54,6 +54,7 @@ object ThresholdSpenderEvolver {
     Iterator.range(0, 2).foreach(_ => {
       distTracker.update(sim)
     })
+    distTracker.record(sim) //record final state of simulation
     distTracker.write("./output", "")
 
   }

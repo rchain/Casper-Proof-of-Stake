@@ -9,9 +9,10 @@ trait Reportable[R, I <: TimeDependent[R], O] {
   private[this] var roundCounter: Iterator[Int] = Iterator.from(1)
   val observations: mutable.HashMap[Int, O] = mutable.HashMap.empty[Int, O]
 
+  final def record(input: I): Unit = memoize(roundCounter.next(), observe(input))
+
   def update(input: I)(implicit idf: IdFactory): R = {
-    val observation: O = observe(input)
-    memoize(roundCounter.next(), observation)
+    record(input)
     input.timeStep()
   }
 

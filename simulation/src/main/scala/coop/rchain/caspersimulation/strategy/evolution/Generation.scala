@@ -6,7 +6,7 @@ import coop.rchain.caspersimulation.network.Network
 import coop.rchain.caspersimulation.reporting.Reportable
 import coop.rchain.caspersimulation.strategy.Strategy
 
-import scala.math.round
+import scala.math.{max, round}
 
 case class Generation(id: String,
                          populationSize: Int,
@@ -26,12 +26,22 @@ case class Generation(id: String,
       reporter.update(network)
       println(s"$id -- $i")
     })
+    reporter.record(network) //record final state
 
-    val aveFitness = validators.map(v => fitness(v)).sum / populationSize
-    val newValidators = validators.flatMap(v => {
-      val numChildren = round(fitness(v) / aveFitness).toInt
-      Iterator.range(0, numChildren).map(_ => Validator(mutator(v.strategy), network))
-    })
+    val fit = validators.map(v => v -> fitness(v)).toMap
+    val mostFitValidator = fit.maxBy(_._2)._1
+    val aveFitness = fit.valuesIterator.sum / populationSize
+    val numChildren = fit.mapValues(f => round(f / aveFitness).toInt)
+    val newPopSize = numChildren.valuesIterator.sum
+    val newValidators = numChildren.flatMap{
+      case (v, nc) =>
+        val childGenerator = if (v == mostFitValidator) { //give most fit validator extra kids to prevent population decrease
+          Iterator.range(0, nc + max(0, populationSize - newPopSize))
+        } else {
+          Iterator.range(0, nc)
+        }
+        childGenerator.map(_ => Validator(mutator(v.strategy), network))
+    }.toSet
 
     Generation(newValidators)
   }
