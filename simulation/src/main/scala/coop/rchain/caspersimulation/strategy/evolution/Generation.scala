@@ -8,13 +8,32 @@ import coop.rchain.caspersimulation.strategy.Strategy
 
 import scala.math.{max, round}
 
+/**
+  * A generation of validators for the evolutionary simulation.
+  * @param id unique identifier
+  * @param populationSize number of validators in the population
+  * @param validators population of validators
+  */
 case class Generation(id: String,
                          populationSize: Int,
                          validators: Set[Validator]) extends Identifiable {
 
-  def nextGeneration[T](rounds: Int,
+  /**
+    * Run the population of validators on the network, then produce a new
+    * generation of validators based on their fitness at the end of the run.
+    * @param rounds Number of validation opportunities each validator has before
+    *               network is reset with a new validator population
+    * @param network Network the validators will work on
+    * @param reporter Makes observations of properties of the network during the run
+    * @param fitness fitness function; the number of children a validator gets in the
+    *                next generation is proportional to their fitness.
+    * @param mutator mutation function, i.e. how strategies in the next generation differ from this one
+    * @param idf id generator for labelling new objects created in process
+    * @return the next generation of validators
+    */
+  def nextGeneration(rounds: Int,
                      network: Network,
-                     reporter: Reportable[Unit, Network, T],
+                     reporter: Reportable[Unit, Network, _],
                      fitness: (Validator) => Double,
                      mutator: (Strategy) => Strategy)(implicit idf: IdFactory): Generation = {
     reporter.reset()

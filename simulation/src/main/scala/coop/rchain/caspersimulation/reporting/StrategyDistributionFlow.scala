@@ -7,6 +7,13 @@ import scala.reflect.ClassTag
 
 import scala.math.sqrt
 
+/**
+  * Records the mean and variance of a continuous parameter of a strategy over the course
+  * of an evolutionary simulation and can output the results as a csv.
+  * @param parameter function extracting the parameter from the strategy
+  * @param filename name of the file to be used when writing the observations to a csv
+  * @tparam S specific type of the strategy being observed
+  */
 case class StrategyDistributionFlow[S <: Strategy: ClassTag](parameter: (S) => Double, filename: String)
   extends CsvReportable[Unit, EvolutionarySimulation, (Double, Double)] {
 

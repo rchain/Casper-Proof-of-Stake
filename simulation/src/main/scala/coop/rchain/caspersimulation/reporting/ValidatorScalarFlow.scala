@@ -5,6 +5,12 @@ import java.io.PrintWriter
 import coop.rchain.caspersimulation.Validator
 import coop.rchain.caspersimulation.network.Network
 
+/**
+  * Reporter who creates a csv file with columns for the validator id, the round number and
+  * a scalar value that is observed for each validator during each round. Note: a round
+  * consists of each validator getting to perform a casper protocol action.
+  * @tparam S type of the observed scalar
+  */
 abstract class ValidatorScalarFlow[S] extends CsvReportable[Unit, Network, Map[Validator, S]] {
 
   val header: String
