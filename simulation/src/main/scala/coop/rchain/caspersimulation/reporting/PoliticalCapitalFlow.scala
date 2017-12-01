@@ -12,6 +12,6 @@ object PoliticalCapitalFlow extends ValidatorScalarFlow[PoliticalCapital] {
 
   override val filename: String = "PCFlow"
 
-  override val header: String = "validator,round,pc"
+  override val observationName: String = "pc"
 
 }

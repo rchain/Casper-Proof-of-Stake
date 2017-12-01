@@ -10,6 +10,6 @@ object RevFlow extends ValidatorScalarFlow[Double] {
 
   override val filename: String = "RevFlow"
 
-  override val header: String = "validator,round,rev"
+  override val observationName: String = "rev"
 
 }

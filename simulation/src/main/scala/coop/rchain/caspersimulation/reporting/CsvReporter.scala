@@ -15,7 +15,7 @@ trait CsvReporter[R, I <: TimeDependent[R], O] extends Reporter[R, I, O] {
 
   def toCsv: IndexedSeq[String]
 
-  override def write(outputPath: String, suffix: String): Unit = {
+  final override def write(outputPath: String, suffix: String): Unit = {
     val outputFile: String = if (suffix.length > 0) {
       s"$outputPath/${filename}_$suffix.csv"
     } else {

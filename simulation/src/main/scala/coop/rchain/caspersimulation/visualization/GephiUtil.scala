@@ -2,7 +2,6 @@ package coop.rchain.caspersimulation.visualization
 
 import java.awt.Color
 
-import org.gephi.appearance.plugin.palette.PaletteGenerator
 import org.gephi.graph.api.{Element, Node}
 
 object GephiUtil {
@@ -18,11 +17,6 @@ object GephiUtil {
       val a = n.getAttribute(name).asInstanceOf[T]
       n.setSize(map(a))
     })
-  }
-
-  def assignColours[T](objects: Set[T]): Map[T, Color] = {
-    val colors = PaletteGenerator.generatePalette(objects.size, 10)
-    objects.iterator.zip(colors.iterator).toMap
   }
 
   def linearRange(sourceMin: Float,

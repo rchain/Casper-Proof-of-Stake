@@ -12,7 +12,7 @@ import scala.collection.mutable
   * @tparam O type of the property the reporter is recording
   */
 trait Reporter[R, I <: TimeDependent[R], O] {
-  private[this] var roundCounter: Iterator[Int] = Iterator.from(1)
+  private[this] var roundCounter: Iterator[Int] = Iterator.from(0)
   val observations: mutable.HashMap[Int, O] = mutable.HashMap.empty[Int, O]
 
   /**

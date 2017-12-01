@@ -98,7 +98,11 @@ object Gephi {
     previewProperties.putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(EdgeColor.Mode.ORIGINAL))
     previewProperties.putValue(PreviewProperty.EDGE_CURVED, FALSE)
     previewProperties.putValue(PreviewProperty.ARROW_SIZE, 5f)
-    palette = PaletteGenerator.generatePalette(numValidators + 1, 10).iterator //one extra colour for the genesis block
+    palette = PaletteGenerator
+      .generatePalette(numValidators + 1, 10) //one extra colour for the genesis block
+      .toIndexedSeq
+      .sortBy(c => (c.getRed, c.getGreen, c.getBlue)) //sort to get consistent colour order
+      .iterator
 
     nodes.clear()
     edges.clear()

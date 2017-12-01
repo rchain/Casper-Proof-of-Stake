@@ -15,14 +15,12 @@ object DagImagesOutput {
 
     val network = UniformRandomDelay(5)
 
-    val reporter = new PoliticalCapitalFlow() and new RevFlow()
+    val reporter = PoliticalCapitalFlow and RevFlow
 
     network.createUser
 
-    //network.createValidator(Human)
-    //network.createValidator(Human)
     val pc1 = new PoliticalCapital(Block.f * Block.f * Genesis.pca.amount)
-    val pc2 = new PoliticalCapital(Block.f * Genesis.pca.amount) //probs the best
+    val pc2 = new PoliticalCapital(Block.f * Genesis.pca.amount)
     val pc3 = new PoliticalCapital(2d * Block.f * Genesis.pca.amount)
     network.createValidator(ThresholdSpender(pc1))
     network.createValidator(ThresholdSpender(pc2))
@@ -39,7 +37,7 @@ object DagImagesOutput {
 
       println(i)
     })
-    reporter.write("./output/")
+    reporter.write("./output", "")
 
     Gephi.formatGraph()
     Gephi.layoutGraph(10)
