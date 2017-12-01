@@ -3,7 +3,7 @@ package coop.rchain.caspersimulation.strategy.evolution
 import coop.rchain.caspersimulation.Validator
 import coop.rchain.caspersimulation.identity.{IdFactory, Identifiable}
 import coop.rchain.caspersimulation.network.Network
-import coop.rchain.caspersimulation.reporting.Reportable
+import coop.rchain.caspersimulation.reporting.Reporter
 import coop.rchain.caspersimulation.strategy.Strategy
 
 import scala.math.{max, round}
@@ -33,7 +33,7 @@ case class Generation(id: String,
     */
   def nextGeneration(rounds: Int,
                      network: Network,
-                     reporter: Reportable[Unit, Network, _],
+                     reporter: Reporter[Unit, Network, _],
                      fitness: (Validator) => Double,
                      mutator: (Strategy) => Strategy)(implicit idf: IdFactory): Generation = {
     reporter.reset()

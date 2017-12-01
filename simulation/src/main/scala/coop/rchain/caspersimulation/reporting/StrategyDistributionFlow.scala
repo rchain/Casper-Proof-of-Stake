@@ -15,7 +15,7 @@ import scala.math.sqrt
   * @tparam S specific type of the strategy being observed
   */
 case class StrategyDistributionFlow[S <: Strategy: ClassTag](parameter: (S) => Double, filename: String)
-  extends CsvReportable[Unit, EvolutionarySimulation, (Double, Double)] {
+  extends CsvReporter[Unit, EvolutionarySimulation, (Double, Double)] {
 
   override def observe(input: EvolutionarySimulation): (Double, Double) = {
     val values = input.currentGeneration.validators.flatMap(v => v.strategy match {

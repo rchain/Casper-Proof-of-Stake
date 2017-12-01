@@ -11,7 +11,7 @@ import scala.collection.mutable
   * @tparam I type of the time dependent object
   * @tparam O type of the property the reporter is recording
   */
-trait Reportable[R, I <: TimeDependent[R], O] {
+trait Reporter[R, I <: TimeDependent[R], O] {
   private[this] var roundCounter: Iterator[Int] = Iterator.from(1)
   val observations: mutable.HashMap[Int, O] = mutable.HashMap.empty[Int, O]
 
@@ -37,7 +37,7 @@ trait Reportable[R, I <: TimeDependent[R], O] {
     * @tparam O2 type of the observations the other reporter is making
     * @return reporter which handles observations from both this and other.
     */
-  final def and[O2](other: Reportable[R, I, O2]): Reportable[R, I, (O, O2)] = Reportable.both(this, other)
+  final def and[O2](other: Reporter[R, I, O2]): Reporter[R, I, (O, O2)] = Reporter.both(this, other)
 
   /**
     * Forget any data this reporter has taken
@@ -62,10 +62,10 @@ trait Reportable[R, I <: TimeDependent[R], O] {
   def write(outputPath: String, suffix: String): Unit
 }
 
-object Reportable {
-  def both[R, I <: TimeDependent[R], O1, O2](r1: Reportable[R, I, O1],
-                                             r2: Reportable[R, I, O2]): Reportable[R, I, (O1, O2)] =
-    new Reportable[R, I, (O1, O2)] {
+object Reporter {
+  def both[R, I <: TimeDependent[R], O1, O2](r1: Reporter[R, I, O1],
+                                             r2: Reporter[R, I, O2]): Reporter[R, I, (O1, O2)] =
+    new Reporter[R, I, (O1, O2)] {
       override def observe(input: I): (O1, O2) = (r1.observe(input), r2.observe(input))
 
       override def memoize(round: Int, value: (O1, O2)): Unit = {

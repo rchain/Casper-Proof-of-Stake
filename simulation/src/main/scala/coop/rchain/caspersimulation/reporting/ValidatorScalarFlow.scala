@@ -11,7 +11,7 @@ import coop.rchain.caspersimulation.network.Network
   * consists of each validator getting to perform a casper protocol action.
   * @tparam S type of the observed scalar
   */
-abstract class ValidatorScalarFlow[S] extends CsvReportable[Unit, Network, Map[Validator, S]] {
+abstract class ValidatorScalarFlow[S] extends CsvReporter[Unit, Network, Map[Validator, S]] {
 
   val header: String
 

@@ -10,7 +10,7 @@ import coop.rchain.caspersimulation.TimeDependent
   * @tparam I type of the time dependent object
   * @tparam O type of the property the reporter is recording
   */
-trait CsvReportable[R, I <: TimeDependent[R], O] extends Reportable[R, I, O] {
+trait CsvReporter[R, I <: TimeDependent[R], O] extends Reporter[R, I, O] {
   val filename: String
 
   def toCsv: IndexedSeq[String]
