@@ -54,7 +54,8 @@ case class Generation(id: String,
     val newPopSize = numChildren.valuesIterator.sum
     val newValidators = numChildren.flatMap{
       case (v, nc) =>
-        val childGenerator = if (v == mostFitValidator) { //give most fit validator extra kids to prevent population decrease
+        val childGenerator = if (v == mostFitValidator) {
+          //give most fit validator extra kids to prevent population decrease
           Iterator.range(0, nc + max(0, populationSize - newPopSize))
         } else {
           Iterator.range(0, nc)
