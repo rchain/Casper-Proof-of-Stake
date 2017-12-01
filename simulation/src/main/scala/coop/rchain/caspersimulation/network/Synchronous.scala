@@ -11,6 +11,8 @@ case object Synchronous extends Network {
 
   private def actors: Iterator[Actor] = users.iterator ++ validators.iterator
 
+  override protected def resetMessages(): Unit = Unit //nothing to reset
+
   //messages are sent instantly on a synchronous network
   override def send(m: Message): Unit = validators.foreach(_.newMessage(m))
 

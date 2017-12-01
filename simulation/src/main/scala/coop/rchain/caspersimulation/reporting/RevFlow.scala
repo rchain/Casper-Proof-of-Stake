@@ -2,14 +2,14 @@ package coop.rchain.caspersimulation.reporting
 import coop.rchain.caspersimulation.Validator
 import coop.rchain.caspersimulation.network.Network
 
-class RevFlow extends ValidatorScalarFlow[Double] {
+object RevFlow extends ValidatorScalarFlow[Double] {
 
   override def observe(input: Network): Map[Validator, Double] = {
     input.validators.map(v => v -> v.revEarned).toMap
   }
 
-  override def filename: String = "RevFlow.csv"
+  override val filename: String = "RevFlow"
 
-  override def header: String = "validator,round,rev"
+  override val header: String = "validator,round,rev"
 
 }

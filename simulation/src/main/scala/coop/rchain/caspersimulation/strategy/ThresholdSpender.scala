@@ -5,6 +5,12 @@ import coop.rchain.caspersimulation.block.{Block, DagUtil}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.protocol._
 
+/**
+  * A strategy which will always accumulate political capital (acknowledge other blocks) when
+  * their political capital balance is below some threshold, and always propose a block with all
+  * available contracts and political capital attached when it is above the threshold.
+  * @param threshold amount of political capital required to choose to propose a block
+  */
 case class ThresholdSpender(threshold: PoliticalCapital) extends Strategy {
   override def pickAckBlocks(validator: Validator): IndexedSeq[Block] = {
     val latestBlocks = DagUtil.latestBlocks(validator.state.blockHist)
