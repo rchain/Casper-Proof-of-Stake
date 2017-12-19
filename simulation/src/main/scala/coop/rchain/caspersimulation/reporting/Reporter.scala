@@ -43,7 +43,7 @@ trait Reporter[R, I <: TimeDependent[R], O] {
     * Forget any data this reporter has taken
     */
   def reset(): Unit = {
-    roundCounter = Iterator.from(1)
+    roundCounter = Iterator.from(0)
     observations.clear()
   }
 
