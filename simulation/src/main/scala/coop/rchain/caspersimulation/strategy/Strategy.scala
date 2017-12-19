@@ -18,10 +18,7 @@ object Strategy {
   def availableContracts(state: State): Set[SmartContract] = {
     val allContracts: mutable.HashSet[SmartContract] = mutable.HashSet.empty[SmartContract]
 
-    state.contractHist.foreach{
-      case c: SmartContract => allContracts.add(c)
-      case _ => Unit //do nothing
-    }
+    state.contractHist.foreach(c => allContracts.add(c))
 
     val head = Ghost.forkChoice(state.blockHist)
 

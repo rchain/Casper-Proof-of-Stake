@@ -22,13 +22,25 @@ sealed abstract class Block extends Identifiable { self =>
     private[this] val queue = new mutable.Queue[Block]()
     queue.enqueue(self)
 
-    override def hasNext: Boolean = queue.nonEmpty
+    @scala.annotation.tailrec
+    final override def hasNext: Boolean = queue.headOption match {
+      case None => false
+      case Some(nxt) => if (visitedBlocks.contains(nxt)) {
+        queue.dequeue() //remove already visited block
+        hasNext //try again to find existence of next block
+      } else {
+        true
+      }
+    }
 
     override def next(): Block = if (hasNext) {
       val nxt = queue.dequeue()
       visitedBlocks.add(nxt)
       if (!end.contains(nxt)) { //only add the parents if we have not yet reached the end
-        nxt.parents.iterator.filter(b => !visitedBlocks.contains(b)).foreach(b => queue.enqueue(b))
+        nxt.parents
+          .iterator //only add parents that have not already been visited
+          .filter(b => !visitedBlocks.contains(b))
+          .foreach(b => queue.enqueue(b))
       }
       nxt
     } else {
