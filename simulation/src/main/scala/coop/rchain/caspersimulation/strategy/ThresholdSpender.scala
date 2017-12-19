@@ -29,21 +29,25 @@ case class ThresholdSpender(threshold: PoliticalCapital) extends Strategy {
     }
 
   override def stateUpdate(validator: Validator)(implicit idf: IdFactory): State = {
-    if (validator.state.pc.amount > threshold.amount & pickContracts(validator).nonEmpty) {
-      val proposeState = if (validator.state.intendedAction == Acknowledge) {
-        validator.state.changeIntent
-      } else {
-        validator.state
-      }
-      proposeState.act(validator)
+    val contracts = pickContracts(validator)
+    if (validator.state.pc.amount > threshold.amount & contracts.nonEmpty) {
+      val blockData = Left(contracts)
+
+      validator.state.act(
+        validator,
+        blockData,
+        assignPC(validator.state.pc, blockData)
+      )
     } else {
-      if (pickAckBlocks(validator).nonEmpty) {
-        val ackState = if (validator.state.intendedAction == Propose) {
-          validator.state.changeIntent
-        } else {
-          validator.state
-        }
-        ackState.act(validator)
+      val acknowledgements = pickAckBlocks(validator)
+      if (acknowledgements.nonEmpty) {
+        val blockData = Right(acknowledgements)
+
+        validator.state.act(
+          validator,
+          blockData,
+          assignPC(validator.state.pc, blockData)
+        )
       } else {
         validator.state
       }

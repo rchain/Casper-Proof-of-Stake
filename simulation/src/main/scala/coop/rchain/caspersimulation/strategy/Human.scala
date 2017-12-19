@@ -78,9 +78,17 @@ case object Human extends Strategy {
     freeInput(question, parseResponse)
   }
 
-  private def act(action: Action, validator: Validator)(implicit idf: IdFactory): State = validator.state match {
-    case State(`action`, _, _) => validator.state.act(validator)
-    case _ => validator.state.changeIntent.act(validator)
+  private def act(action: Action, validator: Validator)(implicit idf: IdFactory): State = {
+    val blockData = action match {
+      case Propose =>
+        Left(validator.pickContracts)
+
+      case Acknowledge =>
+        Right(validator.pickAckBlocks)
+    }
+    val pca = validator.assignPC(blockData)
+
+    validator.state.act(validator, blockData, pca)
   }
 
 
