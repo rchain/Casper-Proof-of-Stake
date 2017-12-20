@@ -21,8 +21,8 @@ object BlockFractionReporter extends CsvReporter[Unit, Network, (Double, Double)
     val blocks = input.validators.flatMap(_.state.blockHist)
     val (ackCount, propCount) = blocks.foldLeft((0L, 0L)){
       case ((ack, prop), b) => b match {
-        case t: Transactions => (ack, prop + 1L)
-        case a: Acknowledgements => (ack + 1L, prop)
+        case _: Transactions => (ack, prop + 1L)
+        case _: Acknowledgements => (ack + 1L, prop)
         case _ => (ack, prop)
       }
     }
