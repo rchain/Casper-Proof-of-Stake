@@ -12,7 +12,7 @@ sealed abstract class Block extends Identifiable { self =>
   val pca: PoliticalCapital //Political Capital Attached
   val justification: IndexedSeq[Block]
 
-  def weight: Double
+  final lazy val weight: Double = toIterator().map(b => b.pca.amount + b.pce.amount).sum
   def pce: PoliticalCapital //Political Capital Earned
 
   def fullDesc: String
@@ -50,7 +50,7 @@ sealed abstract class Block extends Identifiable { self =>
 }
 
 object Block {
-  val f: Double = 0.4 //the fraction used in calculating weights and PC earnings
+  val f: Double = 0.4 //the fraction used in calculating PC earnings
 }
 
 case object Genesis extends Block {
@@ -60,9 +60,7 @@ case object Genesis extends Block {
   override val pca: PoliticalCapital = new PoliticalCapital(10d) //initial amount of political capital
   override val justification: IndexedSeq[Block] = IndexedSeq(Genesis) //genesis justifies itself (...somehow)
 
-  override def weight: Double = pca.amount
-
-  override def pce: PoliticalCapital = new PoliticalCapital(Block.f * pca.amount)
+  override def pce: PoliticalCapital = new PoliticalCapital(0d)
 
   override def fullDesc: String = toString()
 }
@@ -73,9 +71,8 @@ case class Transactions(id: String,
                         pca: PoliticalCapital,
                         txns: IndexedSeq[SmartContract],
                         justification: IndexedSeq[Block]) extends Block {
-  override def weight: Double = pca.amount
 
-  override def pce: PoliticalCapital = new PoliticalCapital(Block.f * pca.amount)
+  override def pce: PoliticalCapital = new PoliticalCapital(0d)
 
   override def fullDesc: String = s"[${parents.mkString(", ")}]${super.toString}($creator -- $pca){${txns.mkString(", ")}}"
 }
@@ -98,12 +95,11 @@ case class Acknowledgements(id: String,
   override val parents: IndexedSeq[Block] = blocks
 
   //memoize recursive function as an optimization
-  private[this] lazy val _weight = pca.amount + (Block.f * blocks.iterator.map(_.weight).sum)
-  override def weight: Double = _weight
-
-  //memoize recursive function as an optimization
   private[this] lazy val _pce =  new PoliticalCapital(
-    Block.f * (pca.amount + blocks.iterator.map(_.pce.amount).sum)
+    Block.f * blocks.iterator.map{
+      case a: Acknowledgements => a.pce.amount
+      case b => b.pca.amount
+    }.sum
   )
   override def pce: PoliticalCapital = _pce
 
