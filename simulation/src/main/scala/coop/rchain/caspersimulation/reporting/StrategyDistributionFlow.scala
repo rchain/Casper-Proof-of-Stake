@@ -30,7 +30,7 @@ case class StrategyDistributionFlow[S <: Strategy: ClassTag](parameter: (S) => D
     (mean, sqrt(variance))
   }
 
-  final def toCsv: IndexedSeq[String] = {
+  final override def toCsv: IndexedSeq[String] = {
     "generation,mean,stddev" +:
       observations.toIndexedSeq.sortBy(_._1).map {
         case (round, (mean, sd)) => s"$round,$mean,$sd"

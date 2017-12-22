@@ -5,7 +5,7 @@ import coop.rchain.caspersimulation.block.{Block, Genesis}
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.PoliticalCapital
-import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow, StrategyDistributionFlow}
+import coop.rchain.caspersimulation.reporting._
 import coop.rchain.caspersimulation.strategy.{Strategy, ThresholdSpender}
 import coop.rchain.caspersimulation.strategy.evolution.EvolutionarySimulation
 
@@ -16,7 +16,7 @@ object ThresholdSpenderEvolver {
     implicit val idf: IdFactory = new IdFactory
     val rounds: Int = 100
     val network = UniformRandomDelay(5)
-    val reporter = PoliticalCapitalFlow and RevFlow
+    val reporter = PoliticalCapitalFlow and RevFlow and BlockFractionReporter
     val numValidators = 10
 
     val fitness = (v: Validator) => {
@@ -49,6 +49,11 @@ object ThresholdSpenderEvolver {
     val distTracker = StrategyDistributionFlow(
       (t: ThresholdSpender) => t.threshold.amount,
       "thresholdDist"
+    ).and(
+      ValidatorPopulationDescription((v: Validator) => v.strategy match {
+        case t: ThresholdSpender => t.threshold.amount.toString
+        case _ => "Non-threshold strategy"
+      }, "thresholdDist_full", "threshold")
     )
 
     Iterator.range(0, 2).foreach(_ => {
