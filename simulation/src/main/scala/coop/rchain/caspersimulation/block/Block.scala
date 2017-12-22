@@ -96,10 +96,7 @@ case class Acknowledgements(id: String,
 
   //memoize recursive function as an optimization
   private[this] lazy val _pce =  new PoliticalCapital(
-    Block.f * blocks.iterator.map{
-      case a: Acknowledgements => a.pce.amount
-      case b => b.pca.amount
-    }.sum
+    Block.f * blocks.iterator.map(b => b.pca.amount + b.pce.amount).sum
   )
   override def pce: PoliticalCapital = _pce
 
