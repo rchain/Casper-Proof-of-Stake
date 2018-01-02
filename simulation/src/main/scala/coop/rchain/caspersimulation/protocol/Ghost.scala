@@ -12,7 +12,12 @@ object Ghost {
 
     val heads = DagUtil.heads(blocks)
 
-    heads.maxBy(b => (score(b, latestBlocks), b.id)) //use id (proxy for hash) to break ties
+    forkChoice(heads, latestBlocks)
+  }
+
+  def forkChoice(heads: Set[Block], latestBlocks: HashSet[Block]): Block = {
+    //use id (proxy for hash) to break ties
+    heads.maxBy(b => (score(b, latestBlocks), b.id))
   }
 
   def score(b: Block, latestBlocks: HashSet[Block] ): Double = {
