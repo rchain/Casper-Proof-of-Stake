@@ -14,10 +14,14 @@ object AverageOffDagBranchLength extends CsvReporter[Unit, Network, Double] {
     val mainHead = Ghost.forkChoice(dagHeads, DagUtil.latestBlocks(blocks.toIndexedSeq, includeGenesis = false))
 
     val offDagLength = dagHeads.iterator.filter(_ != mainHead)
-      .map(b => b -> DagUtil.greatestCommonParent(b, mainHead)) //point each non-main block at its closest main DAG block
-      .map{ //count the number of blocks between the non-main head and main parent
-      case (start, end) => start.toIterator(Some(end)).size - 1
-    }.sum
+      .map(
+        //point each non-main block at its closest main DAG block
+        b => b -> DagUtil.greatestCommonParent(b, mainHead)
+      )
+      .map{
+        //count the number of blocks between the non-main head and main parent
+        case (start, end) => start.toIterator(Some(end)).size - 1
+      }.sum
 
     offDagLength.toDouble / (dagHeads.size - 1) //average length = (total length) / (num branches)
   }

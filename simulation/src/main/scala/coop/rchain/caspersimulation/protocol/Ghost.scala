@@ -16,7 +16,8 @@ object Ghost {
   }
 
   def forkChoice(heads: Set[Block], latestBlocks: HashSet[Block]): Block = {
-    heads.maxBy(b => (score(b, latestBlocks), b.id)) //use id (proxy for hash) to break ties
+    //use id (proxy for hash) to break ties
+    heads.maxBy(b => (score(b, latestBlocks), b.id))
   }
 
   def score(b: Block, latestBlocks: HashSet[Block] ): Double = {
