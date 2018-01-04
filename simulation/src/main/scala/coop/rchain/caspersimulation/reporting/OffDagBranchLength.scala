@@ -4,11 +4,11 @@ import coop.rchain.caspersimulation.block.DagUtil
 import coop.rchain.caspersimulation.network.Network
 import coop.rchain.caspersimulation.protocol.Ghost
 
-object AverageOffDagBranchLength extends CsvReporter[Unit, Network, Double] {
+object OffDagBranchLength extends CsvReporter[Unit, Network, (Int, Int)] {
 
-  override val filename: String = "AverageOffDagBranchLength"
+  override val filename: String = "OffDagBranchLength"
 
-  override def observe(input: Network): Double = {
+  override def observe(input: Network): (Int, Int) = {
     val blocks = input.validators.flatMap(_.state.blockHist)
     val dagHeads = DagUtil.heads(blocks)
     val mainHead = Ghost.forkChoice(dagHeads, DagUtil.latestBlocks(blocks.toIndexedSeq, includeGenesis = false))
@@ -23,14 +23,15 @@ object AverageOffDagBranchLength extends CsvReporter[Unit, Network, Double] {
         case (start, end) => start.toIterator(Some(end)).size - 1
       }.sum
 
-    offDagLength.toDouble / (dagHeads.size - 1) //average length = (total length) / (num branches)
+    //(total length) , (num non-main branches)
+    offDagLength -> (dagHeads.size - 1)
   }
 
   override def toCsv: IndexedSeq[String] = {
     val rounds = observations.keys.toIndexedSeq.sorted
 
     "round,offDagLength" +: rounds.map(i => {
-      s"$i,${observations(i)}"
+      s"$i,${observations(i)._1},${observations(i)._2}"
     })
   }
 }
