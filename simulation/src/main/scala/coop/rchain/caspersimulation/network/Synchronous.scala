@@ -14,7 +14,7 @@ case object Synchronous extends Network {
   override protected def resetMessages(): Unit = Unit //nothing to reset
 
   //messages are sent instantly on a synchronous network
-  override def send(m: Message): Unit = validators.foreach(_.newMessage(m))
+  override def sendToValidators(m: Message): Unit = validators.foreach(_.newMessage(m))
 
   override def timeStep()(implicit idf: IdFactory): Unit = {
     val turnOrder = shuffler.shuffle(actors) //randomize turn order for fairness

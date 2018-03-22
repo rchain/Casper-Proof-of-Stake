@@ -1,28 +1,38 @@
 package coop.rchain.caspersimulation.protocol
 
-import coop.rchain.caspersimulation.block.{Block, DagUtil}
+import coop.rchain.caspersimulation.block.{Block, BlockDag}
 
-import scala.collection.immutable.HashSet
+import scala.annotation.tailrec
+import scala.collection.mutable
 
 object Ghost {
 
-  def forkChoice(blocks: IndexedSeq[Block]): Block = {
+  def orderedHeads(dag: BlockDag, latestBlocks: mutable.HashSet[Block]): IndexedSeq[Block] = {
+    val (scores, children, genesis) = dag.scoringAndChildren(latestBlocks)
+    val decreasingOrder = Ordering[Int].reverse
 
-    val latestBlocks = DagUtil.latestBlocks(blocks, includeGenesis = false)
+    @tailrec
+    def sortChildren(blks: IndexedSeq[Block]): IndexedSeq[Block] = {
+      val newBlks = blks.flatMap(b => {
+        val c = children(b)
+        if(c.nonEmpty){
+          c.toIndexedSeq.sortBy(scores)(decreasingOrder)
+        } else {
+          Some(b)
+        }
+      })
+      if (newBlks == blks) {
+        blks
+      } else {
+        sortChildren(newBlks)
+      }
+    }
 
-    val heads = DagUtil.heads(blocks)
-
-    forkChoice(heads, latestBlocks)
+    sortChildren(IndexedSeq(genesis))
   }
 
-  def forkChoice(heads: Set[Block], latestBlocks: HashSet[Block]): Block = {
-    //use id (proxy for hash) to break ties
-    heads.maxBy(b => (score(b, latestBlocks), b.id))
-  }
-
-  def score(b: Block, latestBlocks: HashSet[Block] ): Double = {
-    DagUtil.foldDag(0d, b, (scr: Double, blk: Block) => {
-      if (latestBlocks.contains(blk)) scr + blk.weight else scr
-    })
+  def forkChoice(dag: BlockDag): Block = {
+    val latestBlocks = dag.latestBlocks
+    orderedHeads(dag, latestBlocks).head
   }
 }

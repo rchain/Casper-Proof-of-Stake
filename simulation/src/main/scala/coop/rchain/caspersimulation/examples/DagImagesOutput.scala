@@ -1,30 +1,41 @@
 package coop.rchain.caspersimulation.examples
 
-import coop.rchain.caspersimulation.block.{Block, Genesis}
+import coop.rchain.caspersimulation.Validator
+import coop.rchain.caspersimulation.block.Block
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
-import coop.rchain.caspersimulation.protocol.PoliticalCapital
-import coop.rchain.caspersimulation.reporting.{PoliticalCapitalFlow, RevFlow, VisualizationReporter}
-import coop.rchain.caspersimulation.strategy.ThresholdSpender
+import coop.rchain.caspersimulation.protocol.BlockCreation
+import coop.rchain.caspersimulation.reporting.{RevFlow, VisualizationReporter}
+
+import scala.collection.immutable.HashMap
 
 object DagImagesOutput {
   def main(args: Array[String]): Unit = {
     implicit val idf: IdFactory = new IdFactory
-    val maxTimeSteps: Int = 100
+    val maxTimeSteps: Int = 10
 
     val network = UniformRandomDelay(5)
 
     network.createUser
+    network.createUser
+    network.createUser
+    network.createUser
+    network.createUser
+    network.createUser
+    network.createValidator
+    network.createValidator
+    network.createValidator
 
-    val pc1 = new PoliticalCapital(Block.f * Block.f * Genesis.pca.amount)
-    val pc2 = new PoliticalCapital(Block.f * Genesis.pca.amount)
-    val pc3 = new PoliticalCapital(2d * Block.f * Genesis.pca.amount)
-    network.createValidator(ThresholdSpender(pc1))
-    network.createValidator(ThresholdSpender(pc2))
-    network.createValidator(ThresholdSpender(pc3))
+    val bonds = network.validators.map(_ -> 10).foldLeft(HashMap.empty[Validator, Int]) {
+      case (map, tuple) => map + tuple
+    }
 
-    val reporter = PoliticalCapitalFlow
-      .and(RevFlow)
+    val genesis = Block.genesis(bonds)
+    val genMsg = BlockCreation(genesis)
+    network.globalDag.add(genesis)
+    network.validators.foreach(_.newMessage(genMsg))
+
+    val reporter = RevFlow
       .and(VisualizationReporter(network.validators.size, "./output/img"))
 
     Iterator.range(0, maxTimeSteps).foreach(i => {

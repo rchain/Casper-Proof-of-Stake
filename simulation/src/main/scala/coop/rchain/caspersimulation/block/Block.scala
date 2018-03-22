@@ -1,121 +1,62 @@
 package coop.rchain.caspersimulation.block
 
-import coop.rchain.caspersimulation.{Actor, Initializer, SmartContract, Validator}
+import coop.rchain.caspersimulation.dag.Node
+import coop.rchain.caspersimulation.{Actor, Initializer, Validator}
 import coop.rchain.caspersimulation.identity.{IdFactory, Identifiable}
-import coop.rchain.caspersimulation.protocol.PoliticalCapital
+import coop.rchain.caspersimulation.onchainstate.{Diff, RChainState, Resource, Transaction}
 
-import scala.collection.mutable
+import scala.collection.immutable.{HashMap, HashSet}
 
-sealed abstract class Block extends Identifiable { self =>
-  val creator: Actor
-  val parents: IndexedSeq[Block]
-  val pca: PoliticalCapital //Political Capital Attached
-  val justification: IndexedSeq[Block]
+case class Block(
+                  id: String,
+                  creator: Actor,
+                  parents: IndexedSeq[Block],
+                  postState: RChainState,
+                  transactions: IndexedSeq[Transaction],
+                  receipts: IndexedSeq[(Diff, Int)],
+                  justification: IndexedSeq[Block]
+                ) extends Identifiable with Node[Block] {
 
-  def weight: Double
-  def pce: PoliticalCapital //Political Capital Earned
+  def fullDesc: String = toString + s"--($creator)[${parents.mkString(";")}]"
 
-  def fullDesc: String
-
-  def toIterator(end: Option[Block] = None): Iterator[Block] = new Iterator[Block]{
-    private[this] val visitedBlocks = new mutable.HashSet[Block]()
-    private[this] val queue = new mutable.Queue[Block]()
-    queue.enqueue(self)
-
-    @scala.annotation.tailrec
-    final override def hasNext: Boolean = queue.headOption match {
-      case None => false
-      case Some(nxt) => if (visitedBlocks.contains(nxt)) {
-        queue.dequeue() //remove already visited block
-        hasNext //try again to find existence of next block
-      } else {
-        true
-      }
-    }
-
-    override def next(): Block = if (hasNext) {
-      val nxt = queue.dequeue()
-      visitedBlocks.add(nxt)
-      if (!end.contains(nxt)) { //only add the parents if we have not yet reached the end
-        nxt.parents
-          .iterator //only add parents that have not already been visited
-          .filter(b => !visitedBlocks.contains(b))
-          .foreach(b => queue.enqueue(b))
-      }
-      nxt
-    } else {
-      Iterator.empty.next()
-    }
+  def weight: Int = creator match {
+    case v: Validator =>
+      parents.head.postState.bonds.getOrElse(v, 0) * parents.length
+    case _ => 0
   }
+
+  //blocks conflict if their transactions overlap (in terms of being the same)
+  //or if they result in Diffs which are incompatible
+  def conflictsWith(other: Block): Boolean =
+    transactions.exists(other.transactions.contains) || receipts.exists{
+      case (diff1, _) =>
+        other.receipts.exists{ case (diff2, _) => !Diff.compatible(diff1, diff2) }
+    }
+
+  override def value: Block = this
+  override def neighbours: Iterator[Node[Block]] = parents.iterator
 }
 
 object Block {
-  val f: Double = 0.4 //the fraction used in calculating weights and PC earnings
-}
+  def apply(
+             creator: Actor,
+             parents: IndexedSeq[Block],
+             postState: RChainState,
+             transactions: IndexedSeq[Transaction],
+             receipts: IndexedSeq[(Diff, Int)],
+             justification: IndexedSeq[Block]
+           )(implicit idf: IdFactory): Block =
+    new Block(idf.next("Block-"), creator, parents, postState, transactions, receipts, justification)
 
-case object Genesis extends Block {
-  override val id: String = "Genesis"
-  override val creator: Actor = Initializer
-  override val parents: IndexedSeq[Block] = IndexedSeq.empty[Block]
-  override val pca: PoliticalCapital = new PoliticalCapital(10d) //initial amount of political capital
-  override val justification: IndexedSeq[Block] = IndexedSeq(Genesis) //genesis justifies itself (...somehow)
+  def genesis(bonds: HashMap[Validator, Int]): Block = {
+    val id = "Genesis"
+    val creator = Initializer
+    val parents = IndexedSeq.empty[Block]
+    val postState = RChainState(HashSet.empty[Resource], bonds)
+    val transactions = IndexedSeq.empty[Transaction]
+    val receipts = IndexedSeq.empty[(Diff, Int)]
+    val justification = IndexedSeq.empty[Block]
 
-  override def weight: Double = pca.amount
-
-  override def pce: PoliticalCapital = new PoliticalCapital(Block.f * pca.amount)
-
-  override def fullDesc: String = toString()
-}
-
-case class Transactions(id: String,
-                        creator: Validator,
-                        parents: IndexedSeq[Block],
-                        pca: PoliticalCapital,
-                        txns: IndexedSeq[SmartContract],
-                        justification: IndexedSeq[Block]) extends Block {
-  override def weight: Double = pca.amount
-
-  override def pce: PoliticalCapital = new PoliticalCapital(Block.f * pca.amount)
-
-  override def fullDesc: String = s"[${parents.mkString(", ")}]${super.toString}($creator -- $pca){${txns.mkString(", ")}}"
-}
-
-object Transactions {
-  def apply(creator: Validator,
-            parents: IndexedSeq[Block],
-            pca: PoliticalCapital,
-            txns: IndexedSeq[SmartContract],
-            justification: IndexedSeq[Block])(implicit idf: IdFactory): Transactions =
-    Transactions(idf.next("block_"), creator, parents, pca, txns, justification)
-}
-
-case class Acknowledgements(id: String,
-                            creator: Validator,
-                            blocks: IndexedSeq[Block],
-                            override val pca: PoliticalCapital,
-                            override val justification: IndexedSeq[Block]) extends Block {
-
-  override val parents: IndexedSeq[Block] = blocks
-
-  //memoize recursive function as an optimization
-  private[this] lazy val _weight = pca.amount + (Block.f * blocks.iterator.map(_.weight).sum)
-  override def weight: Double = _weight
-
-  //memoize recursive function as an optimization
-  private[this] lazy val _pce =  new PoliticalCapital(
-    Block.f * (pca.amount + blocks.iterator.map(_.pce.amount).sum)
-  )
-  override def pce: PoliticalCapital = _pce
-
-  override def fullDesc: String = s"[${blocks.mkString(", ")}]${super.toString}($creator -- $pca){${blocks.mkString(", ")}}"
-}
-
-object Acknowledgements {
-  def apply(creator: Validator,
-            blocks: IndexedSeq[Block],
-            pca: PoliticalCapital,
-            justification: IndexedSeq[Block])(implicit idf: IdFactory): Acknowledgements = {
-    Acknowledgements(idf.next("block_"), creator, blocks, pca, justification)
+    Block(id, creator, parents, postState, transactions, receipts, justification)
   }
 }
-

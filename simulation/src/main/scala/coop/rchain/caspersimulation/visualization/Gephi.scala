@@ -17,7 +17,7 @@ import org.openide.util.Lookup
 
 import scala.collection.mutable
 import GephiUtil._
-import coop.rchain.caspersimulation.block.{Block, Transactions}
+import coop.rchain.caspersimulation.block.{Block, BlockDag}
 import coop.rchain.caspersimulation.protocol.Ghost
 
 object Gephi {
@@ -45,6 +45,7 @@ object Gephi {
   }
 
   //data in the graph
+  private val dag: BlockDag = new BlockDag()
   private val nodes: mutable.HashMap[Block, Node] = mutable.HashMap.empty[Block, Node]
   private val edges: mutable.HashMap[(Block, Block), Edge] = mutable.HashMap.empty[(Block, Block), Edge]
   private val colors: mutable.HashMap[String, Color] = mutable.HashMap.empty[String, Color]
@@ -54,15 +55,15 @@ object Gephi {
     val newBlocks = blocks.filter(b => !existingBlocks.contains(b))
 
     newBlocks.foreach(b => {
+      dag.add(b)
+
       val n = model.factory().newNode(b.id)
       n.setAttribute("Creator", b.creator.id)
       if (!colors.contains(b.creator.id)) {
         colors += (b.creator.id -> palette.next())
       }
-      val nContracts = b match {
-        case x: Transactions => x.txns.length
-        case _ => 0
-      }
+      val nContracts = b.transactions.length
+
       n.setAttribute("NumContracts", nContracts)
       nodes += (b -> n)
       graph.addNode(n)
@@ -104,6 +105,7 @@ object Gephi {
       .sortBy(c => (c.getRed, c.getGreen, c.getBlue)) //sort to get consistent colour order
       .iterator
 
+    dag.clear()
     nodes.clear()
     edges.clear()
     colors.clear()
@@ -126,9 +128,10 @@ object Gephi {
     setElementColorByAttribute[String](nodes.valuesIterator, "Creator", colors)
     setNodeSizeByAttribute(nodes.valuesIterator, "NumContracts", sizeFunc)
 
-    val dagHead = Ghost.forkChoice(nodes.keys.toIndexedSeq) //mark the main DAG based on GHOST fork choice
+    val dagHead = Ghost.forkChoice(dag) //mark the main DAG based on GHOST fork choice
     edges.valuesIterator.foreach(_.setAttribute("MainDAG", false))
-    dagHead.toIterator().foreach(b => {
+    dag.bfIterator(Some(dagHead)).foreach(n => {
+      val b = n.value
       b.parents.foreach(p => edges((b, p)).setAttribute("MainDAG", true))
     })
     setElementColorByAttribute[Boolean](edges.valuesIterator, "MainDAG", (b: Boolean) => {

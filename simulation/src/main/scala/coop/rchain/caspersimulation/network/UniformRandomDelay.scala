@@ -22,7 +22,7 @@ case class UniformRandomDelay(maxDelay: Int, seed: Option[Int] = None) extends N
 
   override protected def resetMessages(): Unit = msgBuffer.clear()
 
-  override def send(m: Message): Unit = validators.foreach(v => {
+  override def sendToValidators(m: Message): Unit = validators.foreach(v => {
     val delayedMessage = DelayedMessage(m, v, delayGenerator.nextInt(maxDelay) + 1)
     msgBuffer.add(delayedMessage)
   })

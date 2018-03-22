@@ -1,6 +1,5 @@
 package coop.rchain.caspersimulation.reporting
 
-import coop.rchain.caspersimulation.block.DagUtil
 import coop.rchain.caspersimulation.network.Network
 import coop.rchain.caspersimulation.protocol.Ghost
 
@@ -9,22 +8,20 @@ object OffDagBranchLength extends CsvReporter[Unit, Network, (Int, Int)] {
   override val filename: String = "OffDagBranchLength"
 
   override def observe(input: Network): (Int, Int) = {
-    val blocks = input.validators.flatMap(_.state.blockHist)
-    val dagHeads = DagUtil.heads(blocks)
-    val mainHead = Ghost.forkChoice(dagHeads, DagUtil.latestBlocks(blocks.toIndexedSeq, includeGenesis = false))
+    val mainHead = Ghost.forkChoice(input.globalDag)
 
-    val offDagLength = dagHeads.iterator.filter(_ != mainHead)
+    val offDagLength = input.globalDag.bfIterator()
       .map(
         //point each non-main block at its closest main DAG block
-        b => b -> DagUtil.greatestCommonParent(b, mainHead)
+        b => b -> input.globalDag.greatestCommonParent(b, mainHead)
       )
       .map{
         //count the number of blocks between the non-main head and main parent
-        case (start, end) => start.toIterator(Some(end)).size - 1
+        case (start, end) => input.globalDag.pathLength(start, end).get - 1
       }.sum
 
     //(total length) , (num non-main branches)
-    offDagLength -> (dagHeads.size - 1)
+    offDagLength -> (input.globalDag.heads.size - 1)
   }
 
   override def toCsv: IndexedSeq[String] = {
