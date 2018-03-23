@@ -20,7 +20,7 @@ object Ghost {
         } else {
           Some(b)
         }
-      })
+      }).distinct
       if (newBlks == blks) {
         blks
       } else {
