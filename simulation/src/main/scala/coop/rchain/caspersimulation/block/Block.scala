@@ -27,6 +27,11 @@ case class Block(
 
   //blocks conflict if their transactions overlap (in terms of being the same)
   //or if they result in Diffs which are incompatible
+  /*
+    TODO:
+    Should probably change this so that it also checks that the
+    histories since the first fork between this block and other do not conflict
+   */
   def conflictsWith(other: Block): Boolean =
     transactions.exists(other.transactions.contains) || receipts.exists{
       case (diff1, _) =>

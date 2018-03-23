@@ -9,15 +9,16 @@ object OffDagBranchLength extends CsvReporter[Unit, Network, (Int, Int)] {
 
   override def observe(input: Network): (Int, Int) = {
     val mainHead = Ghost.forkChoice(input.globalDag)
+    val nonMainHeads = input.globalDag.heads - mainHead
 
-    val offDagLength = input.globalDag.bfIterator()
+    val offDagLength = nonMainHeads
       .map(
         //point each non-main block at its closest main DAG block
         b => b -> input.globalDag.greatestCommonParent(b, mainHead)
       )
       .map{
         //count the number of blocks between the non-main head and main parent
-        case (start, end) => input.globalDag.pathLength(start, end).get - 1
+        case (start, end) => input.globalDag.pathLength(start, end).get
       }.sum
 
     //(total length) , (num non-main branches)
@@ -27,7 +28,7 @@ object OffDagBranchLength extends CsvReporter[Unit, Network, (Int, Int)] {
   override def toCsv: IndexedSeq[String] = {
     val rounds = observations.keys.toIndexedSeq.sorted
 
-    "round,offDagLength" +: rounds.map(i => {
+    "round,offDagLength,totalNonMainHeads" +: rounds.map(i => {
       s"$i,${observations(i)._1},${observations(i)._2}"
     })
   }

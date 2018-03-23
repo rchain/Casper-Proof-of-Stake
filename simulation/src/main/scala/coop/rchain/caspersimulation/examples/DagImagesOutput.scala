@@ -5,7 +5,7 @@ import coop.rchain.caspersimulation.block.Block
 import coop.rchain.caspersimulation.identity.IdFactory
 import coop.rchain.caspersimulation.network.UniformRandomDelay
 import coop.rchain.caspersimulation.protocol.BlockCreation
-import coop.rchain.caspersimulation.reporting.{RevFlow, VisualizationReporter}
+import coop.rchain.caspersimulation.reporting.{OffDagBranchLength, RevFlow, VisualizationReporter}
 
 import scala.collection.immutable.HashMap
 
@@ -36,6 +36,7 @@ object DagImagesOutput {
     network.validators.foreach(_.newMessage(genMsg))
 
     val reporter = RevFlow
+      .and(OffDagBranchLength)
       .and(VisualizationReporter(network.validators.size, "./output/img"))
 
     Iterator.range(0, maxTimeSteps).foreach(i => {

@@ -1,5 +1,6 @@
 package coop.rchain.caspersimulation
 
+import coop.rchain.caspersimulation.dag.Node
 import coop.rchain.caspersimulation.identity.{IdFactory, Identifiable}
 import coop.rchain.caspersimulation.network.Network
 import coop.rchain.caspersimulation.onchainstate.{Deploy, Resource}
@@ -45,9 +46,14 @@ case class Validator(id: String, network: Network, state: ProtocolState) extends
     })
   }
 
+  //add up all the rev spent in transactions contained in blocks that
+  //were created by this validator and made it into the main DAG.
   final def revEarned: Int = {
-    //TODO: put in proper reward formula here
-    0
+    val head = Ghost.forkChoice(state.blockDag)
+    state.blockDag.bfIterator(Some(head)).filter(_.value.creator == this).foldLeft(0){
+      case (acc, Node(b)) =>
+        acc + b.receipts.iterator.map(_._2).sum
+    }
   }
 }
 
