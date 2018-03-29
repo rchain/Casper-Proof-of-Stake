@@ -12,7 +12,6 @@ sealed abstract class Resource extends Identifiable {
 
 object Resource {
   private val rnd = new Random()
-  private val maxIndex = 15
 
   val producePrefix: String = "Produce-"
   val consumePrefix: String = "Consume-"
@@ -22,7 +21,12 @@ object Resource {
 
   def random: Resource = {
     val isProduction = rnd.nextBoolean()
-    val index = rnd.nextInt(maxIndex).formatted("%04d")
+    // An arbitrary exponential function that puts 50% of the transactions to the first 33 indices
+    // and 99% of the transactions to the first 9766 indices.
+    // This is trying to roughly model the distribution of transactions
+    // across names in a production setting.
+    val exponentialRandom = (Math.pow(Math.log(rnd.nextDouble()), 3) / -0.01).toInt
+    val index = exponentialRandom.formatted("%04d")
     if (isProduction) {
       val continue = rnd.nextBoolean()
       if (continue) {
