@@ -7,18 +7,20 @@ import scala.collection.mutable
 
 object Ghost {
 
-  def orderedHeads(dag: BlockDag, latestBlocks: mutable.HashSet[Block]): IndexedSeq[Block] = {
+  def orderHeads(dag: BlockDag, latestBlocks: mutable.HashSet[Block]): IndexedSeq[Block] = {
     val (scores, children, genesis) = dag.scoringAndChildren(latestBlocks)
     val decreasingOrder = Ordering[Int].reverse
 
     @tailrec
     def sortChildren(blks: IndexedSeq[Block]): IndexedSeq[Block] = {
       val newBlks = blks.flatMap(b => {
-        val c = children(b)
-        if(c.nonEmpty){
-          c.toIndexedSeq.sortBy(scores)(decreasingOrder)
+        val empty = new mutable.HashSet[Block]()
+        // TODO: Look into why getOrElse is needed
+        val c : mutable.HashSet[Block] = children.getOrElse(b, empty)
+          if(c.nonEmpty) {
+            c.toIndexedSeq.sortBy(scores)(decreasingOrder)
         } else {
-          Some(b)
+          IndexedSeq(b)
         }
       }).distinct
       if (newBlks == blks) {
@@ -27,12 +29,12 @@ object Ghost {
         sortChildren(newBlks)
       }
     }
-
     sortChildren(IndexedSeq(genesis))
   }
 
   def forkChoice(dag: BlockDag): Block = {
-    val latestBlocks = dag.latestBlocks
-    orderedHeads(dag, latestBlocks).head
+    val latestBlocks: mutable.HashSet[Block] = dag.latestBlocks
+    val orderedHeads : IndexedSeq[Block] = orderHeads(dag, latestBlocks)
+    orderedHeads.head
   }
 }

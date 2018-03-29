@@ -95,14 +95,18 @@ class BlockDag extends Dag[Block, Block]{
 
     //add scores to the blocks implicitly supported through including a latest block as a "step parent"
     lblks.foreach(lb => {
-      val children = chldMap(lb)
-      children.foreach(c => {
-        if (c.parents.length > 1 && c.creator != lb.creator) {
-          val currScore = scrMap(c)
-          val valWeight = lb.postState.bonds(lb.creator.asInstanceOf[Validator])
-          scrMap.update(c, currScore + valWeight)
-        }
-      })
+      val possibleChildren : Option[mutable.HashSet[Block]] = chldMap.get(lb)
+      possibleChildren match {
+        case Some(children) =>
+          children.foreach(c => {
+          if (c.parents.length > 1 && c.creator != lb.creator) {
+            val currScore = scrMap(c)
+            val valWeight = lb.postState.bonds(lb.creator.asInstanceOf[Validator])
+            scrMap.update(c, currScore + valWeight)
+          }
+        })
+        case None => Unit
+      }
     })
 
     (scrMap, chldMap, genesis)

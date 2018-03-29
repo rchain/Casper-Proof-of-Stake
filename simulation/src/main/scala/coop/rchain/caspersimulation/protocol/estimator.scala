@@ -28,7 +28,7 @@ object estimator {
     //justification consists of all the most recent blocks I know about
     val latestBlocks = state.blockDag.latestBlocks
 
-    val orderedHeads = Ghost.orderedHeads(state.blockDag, latestBlocks)
+    val orderedHeads = Ghost.orderHeads(state.blockDag, latestBlocks)
 
     //take as many blocks which do not conflict as possible,
     //starting with the higher scoring ones
