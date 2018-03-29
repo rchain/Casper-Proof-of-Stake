@@ -15,10 +15,9 @@ object Ghost {
     def sortChildren(blks: IndexedSeq[Block]): IndexedSeq[Block] = {
       val newBlks = blks.flatMap(b => {
         val empty = new mutable.HashSet[Block]()
-        // TODO: Look into why getOrElse is needed
         val c : mutable.HashSet[Block] = children.getOrElse(b, empty)
-          if(c.nonEmpty) {
-            c.toIndexedSeq.sortBy(scores)(decreasingOrder)
+        if (c.nonEmpty) {
+          c.toIndexedSeq.sortBy(scores)(decreasingOrder)
         } else {
           IndexedSeq(b)
         }

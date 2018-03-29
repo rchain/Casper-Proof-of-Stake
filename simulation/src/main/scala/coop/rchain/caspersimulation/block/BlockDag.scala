@@ -64,10 +64,6 @@ class BlockDag extends Dag[Block, Block]{
     val scrMap = new mutable.HashMap[Block, Int]()
     var genesis: Block = null
 
-    _childlessBlocks.foreach(b => {
-      chldMap += (b -> new mutable.HashSet[Block]())
-    })
-
     //propagate scores for each latest block
     //(note that there is one latest block for each validator so this is equivalent to propagating validator scores)
     lblks.foreach(lb => lb.creator match {
