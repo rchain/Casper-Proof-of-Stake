@@ -5,7 +5,7 @@ import coop.rchain.caspersimulation.identity.{IdFactory, Identifiable}
 import scala.collection.immutable.HashSet
 import scala.util.Random
 
-sealed abstract class Resource extends Identifiable {}
+sealed abstract class Resource extends Identifiable
 
 object Resource {
   private val rnd = new Random()
@@ -27,14 +27,14 @@ object Resource {
     p.id.drop(producePrefix.length) == c.id.drop(consumePrefix.length)
 
   def random: Resource = {
-    val isProduction = rnd.nextBoolean()
+    val isConsume = rnd.nextBoolean()
     // An arbitrary exponential function that puts 50% of the transactions to the first 33 indices
     // and 99% of the transactions to the first 9766 indices.
     // This is trying to roughly model the distribution of transactions
     // across names in a production setting.
     val exponentialRandom = (Math.pow(Math.log(rnd.nextDouble()), 3) / -0.01).toInt
     val index = exponentialRandom.formatted("%04d")
-    if (isProduction) {
+    if (isConsume) {
       val continue = rnd.nextBoolean()
       if (continue) {
         Consume(producePrefix + index, random)
@@ -53,13 +53,4 @@ case object Stopped extends Resource {
 
 case class Consume(id: String, continuation: Resource = Stopped) extends Resource
 
-object Consume {
-  def apply(continuation: Resource)(implicit idf: IdFactory): Consume =
-    Consume(idf.next(Resource.producePrefix), continuation)
-}
-
 case class Produce(id: String) extends Resource
-
-object Produce {
-  def apply()(implicit idf: IdFactory): Produce = Produce(idf.next(Resource.consumePrefix))
-}
