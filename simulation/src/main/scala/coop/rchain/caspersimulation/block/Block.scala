@@ -19,12 +19,6 @@ case class Block(
 
   def fullDesc: String = toString + s"--($creator)[${parents.mkString(";")}]"
 
-  def weight: Int = creator match {
-    case v: Validator =>
-      parents.head.postState.bonds.getOrElse(v, 0) * parents.length
-    case _ => 0
-  }
-
   //blocks conflict if their transactions overlap (in terms of being the same)
   //or if they result in Diffs which are incompatible
   /*
