@@ -58,7 +58,7 @@ object BlockDagScoringTest {
     }
 
     def assertHeadOrder(dag: BlockDag, answer: IndexedSeq[Block]): Unit = {
-      val ordering = Ghost.orderedHeads(dag, dag.latestBlocks)
+      val ordering = Ghost.orderHeads(dag, dag.latestBlocks)
       assert(ordering == answer)
     }
 
