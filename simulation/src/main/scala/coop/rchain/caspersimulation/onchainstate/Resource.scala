@@ -2,13 +2,10 @@ package coop.rchain.caspersimulation.onchainstate
 
 import coop.rchain.caspersimulation.identity.{IdFactory, Identifiable}
 
+import scala.collection.immutable.HashSet
 import scala.util.Random
 
-sealed abstract class Resource extends Identifiable {
-  def isStopped: Boolean
-  def isProduce: Boolean
-  def isConsume: Boolean
-}
+sealed abstract class Resource extends Identifiable {}
 
 object Resource {
   private val rnd = new Random()
@@ -16,7 +13,17 @@ object Resource {
   val producePrefix: String = "Produce-"
   val consumePrefix: String = "Consume-"
 
-  def matches(p: Produce, c: Consume): Boolean =
+  def consumes(resource: HashSet[Resource]): HashSet[Consume] = toConsumesProducesPair(resource)._1
+  def produces(resource: HashSet[Resource]): HashSet[Produce] = toConsumesProducesPair(resource)._2
+
+  private def toConsumesProducesPair(resource: HashSet[Resource]): (HashSet[Consume], HashSet[Produce]) =
+    resource.foldLeft(HashSet[Consume](), HashSet[Produce]()) {
+      case ((cs, ps), c: Consume) => (cs + c, ps)
+      case ((cs, ps), p: Produce) => (cs, ps + p)
+      case ((cs, ps), _) => (cs, ps)
+    }
+
+  def matches(c: Consume, p: Produce): Boolean =
     p.id.drop(producePrefix.length) == c.id.drop(consumePrefix.length)
 
   def random: Resource = {
@@ -30,41 +37,29 @@ object Resource {
     if (isProduction) {
       val continue = rnd.nextBoolean()
       if (continue) {
-        Produce(producePrefix + index, random)
+        Consume(producePrefix + index, random)
       } else {
-        Produce(producePrefix + index, Stopped)
+        Consume(producePrefix + index, Stopped)
       }
     } else {
-      Consume(consumePrefix + index)
+      Produce(consumePrefix + index)
     }
   }
 }
 
 case object Stopped extends Resource {
   override val id: String = "Stopped"
-
-  override def isStopped: Boolean = true
-  override def isProduce: Boolean = false
-  override def isConsume: Boolean = false
 }
 
-case class Produce(id: String, continuation: Resource = Stopped) extends Resource {
-  override def isStopped: Boolean = false
-  override def isProduce: Boolean = true
-  override def isConsume: Boolean = false
-}
-
-object Produce {
-  def apply(continuation: Resource)(implicit idf: IdFactory): Produce =
-    Produce(idf.next(Resource.producePrefix), continuation)
-}
-
-case class Consume(id: String) extends Resource {
-  override def isStopped: Boolean = false
-  override def isProduce: Boolean = false
-  override def isConsume: Boolean = true
-}
+case class Consume(id: String, continuation: Resource = Stopped) extends Resource
 
 object Consume {
-  def apply()(implicit idf: IdFactory): Consume = Consume(idf.next(Resource.consumePrefix))
+  def apply(continuation: Resource)(implicit idf: IdFactory): Consume =
+    Consume(idf.next(Resource.producePrefix), continuation)
+}
+
+case class Produce(id: String) extends Resource
+
+object Produce {
+  def apply()(implicit idf: IdFactory): Produce = Produce(idf.next(Resource.consumePrefix))
 }
