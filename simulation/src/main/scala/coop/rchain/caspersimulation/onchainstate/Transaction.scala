@@ -25,26 +25,26 @@ object Deploy {
   @tailrec
   final def transform(resource: Resource, state: RChainState, runningDiff: ResourceDiff): (RChainState, ResourceDiff) =
     resource match {
-      case p: Produce =>
-        val consumes = state.resources.filter(_.isConsume)
-        consumes.find(c => Resource.matches(p, c.asInstanceOf[Consume])) match {
-          case Some(c) =>
-            val pair = HashSet(p, c)
-            transform(p.continuation, state.without(pair), runningDiff + pair)
-          case None =>
-            val postState = RChainState(state.resources + p, state.bonds)
-            val finalDiff = runningDiff + HashSet(p)
-            (postState, finalDiff)
-        }
       case c: Consume =>
-        val produces = state.resources.filter(_.isProduce)
-        produces.find(p => Resource.matches(p.asInstanceOf[Produce], c)).map(_.asInstanceOf[Produce]) match {
+        val produces = Resource.produces(state.resources)
+        produces.find(p => Resource.matches(c, p)) match {
           case Some(p) =>
-            val pair: HashSet[Resource] = HashSet(p, c)
-            transform(p.continuation, state.without(pair), runningDiff + pair)
+            val pair : HashSet[Resource] = HashSet(c, p)
+            transform(c.continuation, state.without(pair), runningDiff + pair)
           case None =>
             val postState = RChainState(state.resources + c, state.bonds)
             val finalDiff = runningDiff + HashSet(c)
+            (postState, finalDiff)
+        }
+      case p: Produce =>
+        val consumes = Resource.consumes(state.resources)
+        consumes.find(c => Resource.matches(c, p)) match {
+          case Some(c) =>
+            val pair: HashSet[Resource] = HashSet(c, p)
+            transform(c.continuation, state.without(pair), runningDiff + pair)
+          case None =>
+            val postState = RChainState(state.resources + p, state.bonds)
+            val finalDiff = runningDiff + HashSet(p)
             (postState, finalDiff)
         }
       case Stopped =>
